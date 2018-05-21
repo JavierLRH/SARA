@@ -1,0 +1,20 @@
+
+<launch>
+
+<param name="use_sim_time" value="false" /> <!-- Used in simulation to manipulate the time. Disabled. -->
+
+  <!-- Load hardware interface -->
+  <node name="SARA_hardware_interface" pkg="sara_control" type="hw_interface"  output="screen"/>
+
+  <!-- Load controller settings -->
+  <rosparam file="$(find sara_control)/config/diff_driver_controller_params.yaml" command="load"/>
+
+
+    <!-- Load controller manager -->
+  <node name="SARA_controller_manager" pkg="controller_manager" type="controller_manager" respawn="false"
+    output="screen" ns="/robot" args="spawn diff_drive_controller" />
+
+
+
+
+</launch>

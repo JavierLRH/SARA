@@ -1,0 +1,13 @@
+<launch>
+
+  <master auto="start"/>
+
+  <node name="canusb" pkg="canusb" type="canusb.py" output="screen">
+    <param name="port" value="/dev/ttyUSB0" />
+    <param name="baud" value="1m" />  <!-- baud = rospy.get_param('~baud') -->
+  </node>
+
+  <node name="lectura" pkg="canusb" type="lectura.py" output="screen"/>
+
+
+</launch>

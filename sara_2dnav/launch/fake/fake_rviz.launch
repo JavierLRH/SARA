@@ -1,0 +1,8 @@
+<launch>
+
+
+  <node pkg="rviz" type="rviz" name="fake_rviz"
+      args="-d $(find sara_2dnav)/rviz/fake.rviz"/>
+
+
+</launch>

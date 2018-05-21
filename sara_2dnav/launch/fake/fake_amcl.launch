@@ -1,0 +1,25 @@
+<launch>
+
+
+  <param name="use_sim_time" value="false" /> <!-- Used in simulation to manipulate the time. Disabled. -->
+
+  <!-- Set the name of the map yaml file: can be overridden on the command line. -->
+  <arg name="map" default="blank_map.yaml" />
+
+  <!-- Run the map server with the desired map -->
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find sara_2dnav)/maps/$(arg map)"/>
+
+  <!-- The move_base node -->
+  <include file="$(find sara_2dnav)/launch/fake/fake_move_base_amcl.launch" />
+
+  <!-- Run fake localization compatible with AMCL output -->
+  <node pkg="fake_localization" type="fake_localization" name="fake_localization" clear_params="true" output="screen">
+     <remap from="base_pose_ground_truth" to="odom" />    <!-- Chage the subscribed topicss -->
+     <param name="global_frame_id" value="map" /> <!-- The frame in which to publish the global_frame_id→odom_frame_id transform over tf-->
+     <param name="odom_frame_id" value="odom" />
+     <param name="base_frame_id" value="base_link" />
+  </node>
+
+  <include file="$(find sara_2dnav)/launch/fake/fake_rviz.launch" />
+
+</launch>
