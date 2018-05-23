@@ -11,8 +11,8 @@
 
 
     <!-- Load controller manager -->
-  <node name="SARA_controller_manager" pkg="controller_manager" type="controller_manager" respawn="false"
-    output="screen" ns="/robot" args="spawn diff_drive_controller" />
+  <node name="SARA_controller_manager" pkg="controller_manager" type="spawner"
+    output="screen"  args="diff_drive_controller" />
 
 
 
