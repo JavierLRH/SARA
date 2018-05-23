@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
-
+#####Creador Francisco Javier La Roda######
+#####Función: Interface entre el controlador hw_interface y el bus can
+#####Recibe: Controlador [Joint_State (commandD, commandI)],Can [Datos Encoder]
+####Envía: Controlador[PosD, PosI, Wi, Wd], Can [DatoI, DatoD]
 import math
 import struct
 from math import sin, cos, pi

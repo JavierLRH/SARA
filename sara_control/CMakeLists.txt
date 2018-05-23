@@ -134,8 +134,9 @@ include_directories(include ${catkin_INCLUDE_DIRS}
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(
-${PROJECT_NAME}_node src/hw_interface.cpp
-${catkin_LIBRARIES}
+  #${PROJECT_NAME}_node src/hw_interface.cpp
+  hw_interface src/hw_interface.cpp
+  ${catkin_LIBRARIES}
 )
 
 ## Rename C++ executable without prefix
@@ -149,7 +150,9 @@ ${catkin_LIBRARIES}
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
- target_link_libraries(${PROJECT_NAME}_node
+target_link_libraries(
+  #${PROJECT_NAME}_node
+  hw_interface
  ${catkin_LIBRARIES}
  )
 
@@ -168,11 +171,12 @@ ${catkin_LIBRARIES}
 # )
 
 ## Mark executables and/or libraries for installation
-#install(TARGETS ${sara_control} ${sara_control}_node
+#install(TARGETS ${PROJECT_NAME}_node
+install(TARGETS hw_interface
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+ )
 
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/

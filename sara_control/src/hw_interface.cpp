@@ -27,10 +27,10 @@ public:
    registerInterface(&jnt_state_interface);
 
    // connect and register the joint position interface
-   hardware_interface::JointHandle vel_handle_a(jnt_state_interface.getHandle("A"), &cmd[0]); //Desired command variable
+   hardware_interface::JointHandle vel_handle_a(jnt_state_interface.getHandle("wheel_left_joint"), &cmd[0]); //Desired command variable
    jnt_vel_interface.registerHandle(vel_handle_a);
 
-   hardware_interface::JointHandle vel_handle_b(jnt_state_interface.getHandle("B"), &cmd[1]);
+   hardware_interface::JointHandle vel_handle_b(jnt_state_interface.getHandle("wheel_right_joint"), &cmd[1]);
    jnt_vel_interface.registerHandle(vel_handle_b);
 
    registerInterface(&jnt_vel_interface);
@@ -48,6 +48,8 @@ public:
     pos[1]=temp_pos[1];
     vel[0]=temp_vel[0];
     vel[1]=temp_vel[1];
+
+
 
 
   }
@@ -84,6 +86,7 @@ public:
     temp_pos[1]=msg->position[1];
     temp_vel[0]=msg->velocity[0];
     temp_vel[1]=msg->velocity[1];
+    ROS_INFO("%s", "Callback de velocidades");
 
 
   }
@@ -119,15 +122,17 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "hw_interface");
   ros::NodeHandle n;
+  ROS_INFO("%s", "Nodo iniciado");
 
   MyRobot robot; //Init the objet
   controller_manager::ControllerManager cm(&robot); //Error
-  ros::Subscriber vel_sub = n.subscribe("vel_sub", 1000,&MyRobot::vel_Callback ,&robot);
+  ros::Subscriber vel_sub = n.subscribe("odom_joint_state", 1000,&MyRobot::vel_Callback ,&robot);
   //ros::Publisher cmd_pub = n.advertise<sensor_msgs::JointState>("cmd_pub", 1000); //Publish data
 
   ros::Time last_time=ros::Time::now();
   ros::Duration elapsed_time;
   ros::Rate loop_rate(10);
+  ROS_INFO("%s", "Entrada al bucle");
 
   while (ros::ok())
   {
