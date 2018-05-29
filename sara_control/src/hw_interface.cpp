@@ -1,5 +1,8 @@
 #include <ros/ros.h>
 #include <boost/scoped_ptr.hpp>
+#include <boost/asio/io_service.hpp>
+#include <boost/thread.hpp>
+
 #include "std_msgs/String.h"
 
 #include <hardware_interface/joint_command_interface.h>
@@ -9,6 +12,8 @@
 #include <controller_manager/controller_manager.h>
 
 #include "sensor_msgs/JointState.h"
+
+
 
 
 
@@ -37,6 +42,18 @@ public:
 
    cmd_pub = n.advertise<sensor_msgs::JointState>("cmd_pub", 1000); //Publish data
 
+   //Inicio las variables
+   pos[0]=0.0;
+   temp_pos[0]=0.0;
+   pos[1]=0.0;
+   temp_pos[1]=0.0;
+   vel[0]=0.0;
+   temp_vel[0]=0.0;
+   vel[1]=0.0;
+   temp_vel[1]=0.0;
+   eff[0]=0.0;
+   eff[1]=0.0;
+
   }
 
 
@@ -48,6 +65,8 @@ public:
     pos[1]=temp_pos[1];
     vel[0]=temp_vel[0];
     vel[1]=temp_vel[1];
+    eff[0]=0.0;
+    eff[1]=0.0;
 
 
 
@@ -75,6 +94,7 @@ public:
 
 
 		cmd_pub.publish(data);
+    ROS_INFO("%s (D:%lf I:%lf)", "Publico",cmd[0], cmd[1]);
 
 
   }
@@ -115,7 +135,23 @@ private:
 };
 
 
+void control_loop(ros::Rate rate, MyRobot* robot ,controller_manager::ControllerManager* cm)
+{
+  ros::Time last_time=ros::Time::now();
+  ros::Duration elapsed_time;
+  while(1)
+  {
 
+    elapsed_time=ros::Time::now()-last_time;
+    last_time=ros::Time::now();
+    robot->read(); //Make
+    cm->update(ros::Time::now(), elapsed_time);
+    robot->write(); //Make
+    rate.sleep();
+  }
+
+
+}
 
 
 int main(int argc, char **argv)
@@ -129,21 +165,10 @@ int main(int argc, char **argv)
   ros::Subscriber vel_sub = n.subscribe("odom_joint_state", 1000,&MyRobot::vel_Callback ,&robot);
   //ros::Publisher cmd_pub = n.advertise<sensor_msgs::JointState>("cmd_pub", 1000); //Publish data
 
-  ros::Time last_time=ros::Time::now();
-  ros::Duration elapsed_time;
-  ros::Rate loop_rate(10);
-  ROS_INFO("%s", "Entrada al bucle");
+  boost::thread(control_loop, ros::Rate(5),&robot,&cm);
 
-  while (ros::ok())
-  {
-    elapsed_time=ros::Time::now()-last_time;
-     last_time=ros::Time::now();
-     robot.read(); //Make
-     cm.update(ros::Time::now(), elapsed_time);
-     robot.write(); //Make
+  ros::spin(); //Permite que se ejecuten Callback
 
-     ros::spinOnce();
-     loop_rate.sleep();
-     //sleep();
-  }
+
+
 }
