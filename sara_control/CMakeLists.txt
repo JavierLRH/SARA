@@ -9,6 +9,7 @@ project(sara_control)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   controller_manager
+  diff_drive_controller
   roscpp
   rospy
   std_msgs
@@ -135,7 +136,7 @@ include_directories(include ${catkin_INCLUDE_DIRS}
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(
   #${PROJECT_NAME}_node src/hw_interface.cpp
-  hw_interface src/hw_interface.cpp
+  control_node src/sara_control_loop.cpp src/sara_hw_interface.cpp
   ${catkin_LIBRARIES}
 )
 
@@ -152,7 +153,7 @@ add_executable(
 ## Specify libraries to link a library or executable target against
 target_link_libraries(
   #${PROJECT_NAME}_node
-  hw_interface
+  control_node
  ${catkin_LIBRARIES}
  )
 
@@ -172,7 +173,7 @@ target_link_libraries(
 
 ## Mark executables and/or libraries for installation
 #install(TARGETS ${PROJECT_NAME}_node
-install(TARGETS hw_interface
+install(TARGETS control_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

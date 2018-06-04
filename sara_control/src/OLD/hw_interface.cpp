@@ -1,3 +1,4 @@
+/********Librerias*************/
 #include <ros/ros.h>
 #include <boost/scoped_ptr.hpp>
 #include <boost/asio/io_service.hpp>
@@ -13,8 +14,10 @@
 
 #include "sensor_msgs/JointState.h"
 
-
-
+/**************Definiciones***************/
+#define left 0
+#define right 1
+#define loop_rate 5
 
 
 class MyRobot : public hardware_interface::RobotHW
@@ -23,19 +26,19 @@ public:
   MyRobot() //Constructor
  {
    // connect and register the joint state interface
-   hardware_interface::JointStateHandle state_handle_a("wheel_left_joint", &pos[0], &vel[0], &eff[0]); //Controller Read from this variables, position, velocity and eff
+   hardware_interface::JointStateHandle state_handle_a("wheel_left_joint", &pos[left], &vel[left], &eff[left]); //Controller Read from this variables, position, velocity and eff
    jnt_state_interface.registerHandle(state_handle_a);
 
-   hardware_interface::JointStateHandle state_handle_b("wheel_right_joint", &pos[1], &vel[1], &eff[1]);
+   hardware_interface::JointStateHandle state_handle_b("wheel_right_joint", &pos[right], &vel[right], &eff[right]);
    jnt_state_interface.registerHandle(state_handle_b);
 
    registerInterface(&jnt_state_interface);
 
    // connect and register the joint position interface
-   hardware_interface::JointHandle vel_handle_a(jnt_state_interface.getHandle("wheel_left_joint"), &cmd[0]); //Desired command variable
+   hardware_interface::JointHandle vel_handle_a(jnt_state_interface.getHandle("wheel_left_joint"), &cmd[left]); //Desired command variable
    jnt_vel_interface.registerHandle(vel_handle_a);
 
-   hardware_interface::JointHandle vel_handle_b(jnt_state_interface.getHandle("wheel_right_joint"), &cmd[1]);
+   hardware_interface::JointHandle vel_handle_b(jnt_state_interface.getHandle("wheel_right_joint"), &cmd[right]);
    jnt_vel_interface.registerHandle(vel_handle_b);
 
    registerInterface(&jnt_vel_interface);
@@ -43,16 +46,16 @@ public:
    cmd_pub = n.advertise<sensor_msgs::JointState>("cmd_pub", 1000); //Publish data
 
    //Inicio las variables
-   pos[0]=0.0;
-   temp_pos[0]=0.0;
-   pos[1]=0.0;
-   temp_pos[1]=0.0;
-   vel[0]=0.0;
-   temp_vel[0]=0.0;
-   vel[1]=0.0;
-   temp_vel[1]=0.0;
-   eff[0]=0.0;
-   eff[1]=0.0;
+   pos[left]=0.0;
+   temp_pos[left]=0.0;
+   pos[right]=0.0;
+   temp_pos[right]=0.0;
+   vel[left]=0.0;
+   temp_vel[left]=0.0;
+   vel[right]=0.0;
+   temp_vel[right]=0.0;
+   eff[left]=0.0;
+   eff[right]=0.0;
 
   }
 
@@ -61,12 +64,13 @@ public:
 
    void read(void)   // Read data from hardware here. joint_state
   {
-    pos[0]=temp_pos[0];
-    pos[1]=temp_pos[1];
-    vel[0]=temp_vel[0];
-    vel[1]=temp_vel[1];
-    eff[0]=0.0;
-    eff[1]=0.0;
+    pos[left]=temp_pos[left];
+    pos[right]=temp_pos[right];
+    vel[left]=temp_vel[left];
+    vel[right]=temp_vel[right];
+
+
+    ROS_INFO("%s (D:%lf I:%lf)", "Leo",pos[left], pos[right]);
 
 
 
@@ -80,21 +84,21 @@ public:
     data.velocity.resize(2);
     data.effort.resize(2);
 
-		data.name[0]="D";
-		data.position[0]=0;
-		data.velocity[0]=cmd[0];
-		data.effort[0]=0;
+		data.name[left]="D";
+		data.position[left]=0;
+		data.velocity[left]=cmd[left];
+		data.effort[left]=0;
 
 
-		data.name[1]="I";
-		data.position[1]=0;
-		data.velocity[1]=cmd[1];
-		data.effort[1]=0;
+		data.name[right]="I";
+		data.position[right]=0;
+		data.velocity[right]=cmd[right];
+		data.effort[right]=0;
 
-
+    ROS_INFO("%s (D:%lf I:%lf)", "Publico",cmd[left], cmd[right]);
 
 		cmd_pub.publish(data);
-    ROS_INFO("%s (D:%lf I:%lf)", "Publico",cmd[0], cmd[1]);
+
 
 
   }
@@ -102,11 +106,11 @@ public:
   void vel_Callback(const sensor_msgs::JointState::ConstPtr& msg)//The message is passed in a boost shared_ptr, which means you can store it off if you want, without worrying about it getting deleted underneath you
   {
     //Lecturas temporales
-    temp_pos[0]=msg->position[0];
-    temp_pos[1]=msg->position[1];
-    temp_vel[0]=msg->velocity[0];
-    temp_vel[1]=msg->velocity[1];
-    ROS_INFO("%s", "Callback de velocidades");
+    temp_pos[right]=msg->position[right];
+    temp_pos[left]=msg->position[left];
+    temp_vel[right]=msg->velocity[right];
+    temp_vel[left]=msg->velocity[left];
+    //ROS_INFO("%s", "Callback de velocidades");
 
 
   }
@@ -165,7 +169,7 @@ int main(int argc, char **argv)
   ros::Subscriber vel_sub = n.subscribe("odom_joint_state", 1000,&MyRobot::vel_Callback ,&robot);
   //ros::Publisher cmd_pub = n.advertise<sensor_msgs::JointState>("cmd_pub", 1000); //Publish data
 
-  boost::thread(control_loop, ros::Rate(5),&robot,&cm);
+  boost::thread(control_loop, ros::Rate(loop_rate),&robot,&cm);
 
   ros::spin(); //Permite que se ejecuten Callback
 
