@@ -24,20 +24,27 @@ from std_msgs.msg import Header
 class odom_class:
 	def __init__(self):
 
+		#parametros constantes
 		self.pasos_vuelta=64000.0
+		self.left= 0
+		self.right= 1
+
+		self.kdato=9.5
+		self.twistTimeout = 2
 
 
 		#Encoders
-		self.time_encA=0
-		self.steps_encA=0
-		self.time_encB=0
-		self.steps_encB=0
+		self.time_enc_left=0
+		self.time_enc_right=0
 
-		self.time_encA_last=0
-		self.time_encB_last=0
+		self.steps_enc_left=0
+		self.steps_enc_right=0
 
-		self.steps_encA_last=0
-		self.steps_encB_last=0
+		self.time_enc_left_last=0
+		self.time_enc_right_last=0
+
+		self.steps_enc_left_last=0
+		self.steps_enc_right_last=0
 
 
 		self.posI=0.0
@@ -57,9 +64,7 @@ class odom_class:
 		self.datod=0
 		self.datoi=0
 
-		self.kdato=9.5
 
-		self.twistTimeout = 2
 
 		self.modoPC=0
 
@@ -111,8 +116,8 @@ class odom_class:
 	def callback_vel(self,msg): #Recepcion de velocidades
 
 		#Guardar variables
-		self.comandD=msg.velocity[0] #rad/s
-		self.comandI=msg.velocity[1] #rad/s
+		self.comandD=msg.velocity[self.right] #rad/s
+		self.comandI=msg.velocity[self.left] #rad/s
 
 		#Ganancia
 
@@ -171,52 +176,64 @@ class odom_class:
 
 	#Read the encoder data
 	def callback_odom(self,msg):
-		if(msg.encID==0): #EncoderA
+		if(msg.encID==0): #EncoderA (RIGHT)
 
-			self.time_encA=msg.time
-			self.steps_encA=msg.data
+			self.time_enc_right=msg.time
+			self.steps_enc_right=msg.data
 
 			#Calcular incrementos
-			dtA=(self.time_encA-self.time_encA_last)*(10**-4) #100us
-			dstepsA=self.steps_encA-self.steps_encA_last
+			dt_right=(self.time_enc_right-self.time_enc_right_last)*(10**-4) #100us
+			dsteps_right=self.steps_enc_right-self.steps_enc_right_last
 
 			#Guardiar variables actuales
-			self.time_encA_last=self.time_encA
-			self.steps_encA_last=self.steps_encA
+			self.time_enc_right_last=self.time_enc_right
+			self.steps_enc_right_last=self.steps_enc_right
 
 			#Posicion
-			self.posD=(dstepsA/self.pasos_vuelta)*2*pi
+			self.posD=(self.steps_enc_right/self.pasos_vuelta)*2*pi
 			#Velocidad angular
-			self.wd=self.posD/dtA
+			self.wd=((dsteps_right/self.pasos_vuelta)*2*pi)/dt_right
 
 
 
 
-		if(msg.encID==1): #EncoderB
+		if(msg.encID==1): #EncoderB (LEFT)
 
-			self.time_encB=msg.time
-			self.steps_encB=msg.data
+			self.time_enc_left=msg.time
+			self.steps_enc_left=msg.data
 
 			#Calcular incrementos
-			dtB=(self.time_encB-self.time_encB_last)*(10**-4) #100us
-			dstepsB=self.steps_encB-self.steps_encB_last
+			dt_left=(self.time_enc_left-self.time_enc_left_last)*(10**-4) #100us
+			dsteps_left=self.steps_enc_left-self.steps_enc_left_last
 
 			#Guardiar variables actuales
-			self.time_encB_last=self.time_encB
-			self.steps_encB_last=self.steps_encB
+			self.time_enc_left_last=self.time_enc_left
+			self.steps_enc_left_last=self.steps_enc_left
 
 			#Distancia
-			self.posI=(dstepsB/self.pasos_vuelta)*2*pi
+			self.posI=(self.steps_enc_left/self.pasos_vuelta)*2*pi
 			#Velocidad angular
-			self.wi=self.posI/dtB
+			self.wi=((dsteps_left/self.pasos_vuelta)*2*pi)/dt_left
 
 
 
 		##Publications
 		data=JointState()
-		data.name=("D","I")
-		data.position=(self.posD, self.posI)
-		data.velocity=(self.wd, self.wi)
+		data.name=["0","0"]
+		data.name[self.left]= "LEFT"
+		data.name[self.right]= "RIGHT"
+
+		data.position=[0, 0]
+		data.position[self.left]=self.posI
+		data.position[self.right]=self.posD
+
+		data.velocity=[0, 0]
+		data.velocity[self.left]=self.wi
+		data.velocity[self.right]=self.wd
+
+		#data.name=("D","I")
+		#data.position=(self.posD, self.posI)
+		#data.velocity=(self.wd, self.wi)
 		data.effort=(0.0,0.0)
 
 		data.header.stamp = rospy.Time.now()

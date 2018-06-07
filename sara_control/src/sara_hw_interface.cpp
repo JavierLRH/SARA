@@ -58,7 +58,7 @@ void MyRobot::read(void)   // Read data from hardware here. joint_state
     vel[right]=temp_vel[right];
 
 
-    ROS_INFO("%s (D:%lf I:%lf)", "Leo",pos[left], pos[right]);
+    ROS_INFO("%s (I:%lf D:%lf)", "Leo",pos[left], pos[right]);
 
 
 
@@ -73,18 +73,18 @@ void MyRobot::write(void)  // Write data to hardware here. joint_command Publica
     data.velocity.resize(2);
     data.effort.resize(2);
 
-		data.name[left]="D";
+		data.name[left]="LEFT";
 		data.position[left]=0;
 		data.velocity[left]=cmd[left];
 		data.effort[left]=0;
 
 
-		data.name[right]="I";
+		data.name[right]="RIGHT";
 		data.position[right]=0;
 		data.velocity[right]=cmd[right];
 		data.effort[right]=0;
 
-    ROS_INFO("%s (D:%lf I:%lf)", "Publico",cmd[left], cmd[right]);
+    ROS_INFO("%s (D:%lf I:%lf)", "Publico",cmd[right], cmd[left]);
 
 		cmd_pub.publish(data);
 

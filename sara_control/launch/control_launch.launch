@@ -12,9 +12,15 @@
   <rosparam file="$(find sara_control)/config/diff_driver_controller_params.yaml" command="load"/>
 
 
+
     <!-- Load controller manager -->
-  <node name="SARA_controller_manager" pkg="controller_manager" type="spawner"
-    output="screen"  args="diff_drive_controller" />
+  <node name="SARA_controller_manager" pkg="controller_manager" type="spawner"  output="screen"  args="diff_drive_controller" >
+  </node>
+  <!--Transform the topic from move_base (cmd_vel) to ros_control (/diff_drive_controller/cmd_vel) -->
+  <node name="cmd_vel_relay" type="relay" pkg="topic_tools" args="/cmd_vel /diff_drive_controller/cmd_vel" />
+  <!--Transform the topic from ros_control  (cmd_vel) to move_base (/diff_drive_controller/cmd_vel)
+  <node name="cmd_vel_relay" type="relay" pkg="topic_tools" args="/diff_drive_controller/odom  /odom" />-->
+
 
 
 
