@@ -10,6 +10,8 @@ double eff[2];
 double temp_pos[2];
 double temp_vel[2];
 
+unsigned int flag_feedback;
+
 
 MyRobot::MyRobot() //Constructor
  {
@@ -45,6 +47,8 @@ MyRobot::MyRobot() //Constructor
    eff[left]=0.0;
    eff[right]=0.0;
 
+   flag_feedback=0;
+
   }
 
 
@@ -52,6 +56,7 @@ MyRobot::MyRobot() //Constructor
 
 void MyRobot::read(void)   // Read data from hardware here. joint_state
   {
+    /*Buffer for the RT thread*/
     pos[left]=temp_pos[left];
     pos[right]=temp_pos[right];
     vel[left]=temp_vel[left];
@@ -94,12 +99,25 @@ void MyRobot::write(void)  // Write data to hardware here. joint_command Publica
 
 void MyRobot::vel_Callback(const sensor_msgs::JointState::ConstPtr& msg)//The message is passed in a boost shared_ptr, which means you can store it off if you want, without worrying about it getting deleted underneath you
   {
-    //Lecturas temporales
+    ROS_INFO("%s", "Callback de velocidades");
     temp_pos[right]=msg->position[right];
     temp_pos[left]=msg->position[left];
     temp_vel[right]=msg->velocity[right];
     temp_vel[left]=msg->velocity[left];
-    //ROS_INFO("%s", "Callback de velocidades");
+
+    flag_feedback=1;
 
 
+
+  }
+
+  unsigned int MyRobot::get_flag_feedback(void)
+  {
+    return flag_feedback;
+
+  }
+
+  void MyRobot::reset_flag_feedback(void)
+  {
+    flag_feedback=0;
   }

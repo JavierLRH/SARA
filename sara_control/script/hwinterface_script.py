@@ -81,18 +81,18 @@ class odom_class:
 
 		#Subscriber
 		rospy.Subscriber("enc", enc_msg, self.callback_odom) #One topic for both encoders
-		rospy.Subscriber("joint_command", JointState, self.callback_vel)#Cambiar al mensaje recibido por el control
+		rospy.Subscriber("cmd_pub", JointState, self.callback_vel)#Cambiar al mensaje recibido por el control
 		rospy.Subscriber("canrx", CAN, self.callback_CAN)
 
-
-		r = rospy.Rate(40.0)
-		self.lastTwistTime = rospy.get_time()
-
 		rospy.loginfo("Esperando sincronizacion")
+
+		#Bucle que para la silla si no se reciben velocidades en un tiempo
+		r = rospy.Rate(5.0)
+		self.lastTwistTime = rospy.get_time()
 		while not rospy.is_shutdown():
 			self.check(self.modoPC)
-
 			r.sleep()
+
 
 	def check(self,modo):
 
@@ -149,6 +149,7 @@ class odom_class:
 			dato.data = struct.pack('B', self.datod) + struct.pack('B', self.datoi) + struct.pack('B', 0) + struct.pack('B', 0) + 'C' + struct.pack('B', 0) + struct.pack('B', 0) + struct.pack('B', 0)
 
 			self.canpub.publish(dato)
+
 
 
 		#Log datos
@@ -240,7 +241,7 @@ class odom_class:
 		data.header.frame_id = "base_link"
 
 
-
+		#rospy.loginfo("Callback encoders")
 
 
 		self.data_pub.publish(data)

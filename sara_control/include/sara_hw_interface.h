@@ -17,8 +17,8 @@
 /**************Definiciones***************/
 #define left 0
 #define right 1
-#define loop_rate 5
-
+#define loop_rate 10 /* 10*F_feedback*/
+#define loop_rate_threshold 0.1 /*10%*/
 
 /************Definicion de clases********/
 
@@ -31,6 +31,9 @@ public:
   void write(void);  // Write data to hardware here. joint_command Publication
 
   void vel_Callback(const sensor_msgs::JointState::ConstPtr& msg);//The message is passed in a boost shared_ptr, which means you can store it off if you want, without worrying about it getting deleted underneath you
+
+  unsigned int get_flag_feedback(void);
+  void reset_flag_feedback(void);
 
 
 private:
