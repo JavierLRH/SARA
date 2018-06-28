@@ -152,8 +152,9 @@ def talker():
         if line == chr(7):
             print "Transmit Failed"
         elif line != "" and line != "z\r" and line != "Z\r":
-            print line ####publicar la trama
+            #print line ####publicar la trama
             #print can.analyze(line)
+            rospy.loginfo_throttle(2, "CAN OK"); #Publica estado cada 2s
             try:
                 msg = can.analyze(line)
                 pub.publish( msg )

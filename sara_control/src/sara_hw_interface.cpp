@@ -10,6 +10,11 @@ double eff[2];
 double temp_pos[2];
 double temp_vel[2];
 
+ros::Time feedback_time[2];
+ros::Time last_feedback_time[2];
+ros::Time low_level_time[2];
+ros::Time last_low_level_time[2];
+
 unsigned int flag_feedback;
 
 
@@ -56,15 +61,40 @@ MyRobot::MyRobot() //Constructor
 
 void MyRobot::read(void)   // Read data from hardware here. joint_state
   {
+    double feedback_period[2];
+    double feedback_delay[2];
+    double low_level_period[2];
     /*Buffer for the RT thread*/
     pos[left]=temp_pos[left];
     pos[right]=temp_pos[right];
     vel[left]=temp_vel[left];
     vel[right]=temp_vel[right];
 
+    //Period of the feedback
+    feedback_period[left]=(feedback_time[left]-last_feedback_time[left]).toSec();
+    feedback_period[right]=(feedback_time[right]-last_feedback_time[right]).toSec();
 
-    ROS_INFO("%s (I:%lf D:%lf)", "Leo",pos[left], pos[right]);
+    //Delay of the feedback
+    feedback_delay[left]=(ros::Time::now()-feedback_time[left]).toSec();
+    feedback_delay[right]=(ros::Time::now()-feedback_time[right]).toSec();
 
+    //Period of the low level time
+    low_level_period[left]=(low_level_time[left]-last_low_level_time[left]).toSec();
+    low_level_period[right]=(low_level_time[right]-last_low_level_time[right]).toSec();
+
+
+    //Save values
+    last_feedback_time[left]=feedback_time[left];
+    last_feedback_time[right]=feedback_time[right];
+    last_low_level_time[left]=low_level_time[left];
+    last_low_level_time[right]=low_level_time[right];
+
+    //ROS_INFO("%s (I:%lf D:%lf)", "Leo",pos[left], pos[right]);
+    ROS_INFO("%s Ti %lf Td %lf DelayI %lf DelayD %lf lowI %lf lowD %lf",
+            "Loop Time",
+            feedback_period[left],feedback_period[right],
+            feedback_delay[left],feedback_delay[right],
+            low_level_period[left],low_level_period[right]);
 
 
 
@@ -89,26 +119,34 @@ void MyRobot::write(void)  // Write data to hardware here. joint_command Publica
 		data.velocity[right]=cmd[right];
 		data.effort[right]=0;
 
-    ROS_INFO("%s (D:%lf I:%lf)", "Publico",cmd[right], cmd[left]);
+    //ROS_INFO("%s (D:%lf I:%lf)", "Publico",cmd[right], cmd[left]);
 
 		cmd_pub.publish(data);
 
 
 
   }
+  //The message is passed in a boost shared_ptr, which means you can store it off if you want, without worrying about it getting deleted underneath you
 
-void MyRobot::vel_Callback(const sensor_msgs::JointState::ConstPtr& msg)//The message is passed in a boost shared_ptr, which means you can store it off if you want, without worrying about it getting deleted underneath you
+void MyRobot::vel_Callback(const sensor_msgs::JointState::ConstPtr& msg)
   {
-    ROS_INFO("%s", "Callback de velocidades");
-    temp_pos[right]=msg->position[right];
-    temp_pos[left]=msg->position[left];
-    temp_vel[right]=msg->velocity[right];
-    temp_vel[left]=msg->velocity[left];
+    //ROS_INFO("%s", "Callback de velocidades");
+    if(msg->name[0] == "RIGHT")
+    {
+    temp_pos[right]=msg->position[0];
+    temp_vel[right]=msg->velocity[0];
+    low_level_time[right]=msg->header.stamp;
+    feedback_time[right]=ros::Time::now();
 
-    flag_feedback=1;
+    }
 
-
-
+    else if(msg->name[0] == "LEFT")
+    {
+    temp_pos[left]=msg->position[0];
+    temp_vel[left]=msg->velocity[0];
+    low_level_time[left]=msg->header.stamp;
+    feedback_time[left]=ros::Time::now();
+    }
   }
 
   unsigned int MyRobot::get_flag_feedback(void)

@@ -4,7 +4,7 @@
   <param name="use_sim_time" value="false" /> <!-- Used in simulation to manipulate the time. Disabled. -->
 
   <!-- Set the name of the map yaml file: can be overridden on the command line. -->
-  <arg name="map" default="blank_map.yaml" />
+  <arg name="map" default="map_obstacle.yaml" />
 
   <!-- Run the map server with the desired map -->
   <node name="map_server" pkg="map_server" type="map_server" args="$(find sara_2dnav)/maps/$(arg map)"/>

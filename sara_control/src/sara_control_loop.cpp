@@ -29,11 +29,7 @@ void control_loop(ros::Rate rate, MyRobot* robot ,controller_manager::Controller
     }
     robot->read();
     cm->update(ros::Time::now(), elapsed_time);
-    if (robot->get_flag_feedback())
-    {
-      robot->reset_flag_feedback();
-      robot->write(); //Make
-    }
+    robot->write();
     rate.sleep();
   }
 

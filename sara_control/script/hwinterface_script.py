@@ -109,7 +109,9 @@ class odom_class:
 
 					self.canpub.publish(dato)
 
-					rospy.loginfo("Parada por no recibir datos")
+					#rospy.loginfo_throttle(5, "Parada por no recibir datos")
+					rospy.loginfo_once("Parada por no recibir datos")
+
 
 		#else:#No SINCRONIZADO
 			#rospy.loginfo("La silla no esta sincronizada")
@@ -197,10 +199,19 @@ class odom_class:
 			#Velocidad angular
 			self.wd=((dsteps_right/self.pasos_vuelta)*2*pi)/dt_right
 
+			#Save data to publish
+			data=JointState()
+			data.name= ["RIGHT"]
+			data.position=[self.posD]
+			data.velocity=[self.wd]
+			data.effort=[0]
+			data.header.stamp = rospy.Time.from_sec(self.time_enc_right_last*(10**-4)) #rospy.Time.now()
+			data.header.frame_id = "base_link"
 
 
 
-		if(msg.encID==1): #EncoderB (LEFT)
+
+		elif(msg.encID==1): #EncoderB (LEFT)
 
 			self.time_enc_left=msg.time
 			self.steps_enc_left=msg.data
@@ -218,34 +229,18 @@ class odom_class:
 			#Velocidad angular
 			self.wi=((dsteps_left/self.pasos_vuelta)*2*pi)/dt_left
 
+			#Save data to publish
+			data=JointState()
+			data.name= ["LEFT"]
+			data.position=[self.posI]
+			data.velocity=[self.wi]
+			data.effort=[0]
+			data.header.stamp =rospy.Time.from_sec(self.time_enc_left_last*(10**-4)) #rospy.Time.now()
+			data.header.frame_id = "base_link"
 
 
-		##Publications
-		data=JointState()
-		data.name=["0","0"]
-		data.name[self.left]= "LEFT"
-		data.name[self.right]= "RIGHT"
 
-		data.position=[0, 0]
-		data.position[self.left]=self.posI
-		data.position[self.right]=self.posD
-
-		data.velocity=[0, 0]
-		data.velocity[self.left]=self.wi
-		data.velocity[self.right]=self.wd
-
-		#data.name=("D","I")
-		#data.position=(self.posD, self.posI)
-		#data.velocity=(self.wd, self.wi)
-		data.effort=(0.0,0.0)
-
-		data.header.stamp = rospy.Time.now()
-		data.header.frame_id = "base_link"
-
-
-		#rospy.loginfo("Callback encoders")
-
-
+		#Publish topic
 		self.data_pub.publish(data)
 
 
