@@ -19,6 +19,7 @@ from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3
 from sara_control.msg import enc_msg
 from sara_control.msg import CAN
 from std_msgs.msg import Header
+from std_msgs.msg import Int16
 
 
 
@@ -55,10 +56,6 @@ class odom_class:
 		self.wi=0.0
 		self.wd=0.0
 
-
-
-
-
 		#command
 		self.comandD=0.0
 		self.comandI=0.0
@@ -66,8 +63,8 @@ class odom_class:
 		self.datod=0
 		self.datoi=0
 
-
-
+		#Status variables
+		self.vbat=0.0
 		self.modoPC=0
 
 	def main(self):
@@ -85,11 +82,12 @@ class odom_class:
 		rospy.Subscriber("enc", enc_msg, self.callback_odom) #One topic for both encoders
 		rospy.Subscriber("cmd_pub", JointState, self.callback_vel)#Cambiar al mensaje recibido por el control
 		rospy.Subscriber("canrx", CAN, self.callback_CAN)
+		rospy.Subscriber("bat", Int16, self.callback_battery)
 
 		rospy.loginfo("Esperando sincronizacion")
 
 		#Bucle que para la silla si no se reciben velocidades en un tiempo
-		r = rospy.Rate(5.0)
+		r = rospy.Rate(2.0)
 		self.lastTwistTime = rospy.get_time()
 		while not rospy.is_shutdown():
 			self.check(self.modoPC)
@@ -112,9 +110,9 @@ class odom_class:
 					#rospy.loginfo_throttle(5, "Parada por no recibir datos")
 					rospy.loginfo_once("Parada por no recibir datos")
 
+			#Weelchair status
+			rospy.loginfo_throttle(60,"Battery voltage "+ str(self.vbat)+ "V")
 
-		#else:#No SINCRONIZADO
-			#rospy.loginfo("La silla no esta sincronizada")
 
 
 	def callback_vel(self,msg): #Recepcion de velocidades
@@ -209,8 +207,6 @@ class odom_class:
 			data.header.frame_id = "base_link"
 
 
-
-
 		elif(msg.encID==1): #EncoderB (LEFT)
 
 			self.time_enc_left=msg.time
@@ -239,9 +235,12 @@ class odom_class:
 			data.header.frame_id = "base_link"
 
 
-
 		#Publish topic
 		self.data_pub.publish(data)
+
+	def callback_battery(self,msg):
+		self.vbat=msg.data*0.1
+
 
 
 

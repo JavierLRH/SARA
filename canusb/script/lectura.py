@@ -45,13 +45,10 @@ def callback(msg):
 		(encA,) = struct.unpack('I',msg.data[0:4])
 		(tencA,) = struct.unpack('I',msg.data[4:8])
 
-
-
 		var_enc = enc_msg()
 		var_enc.time = int(tencA)
 		var_enc.data = int(encA)
 		var_enc.encID=0
-		#enca_pub.publish(var_enc)
 
 		enc_pub.publish(var_enc)
 
@@ -60,13 +57,10 @@ def callback(msg):
 		(encB,) = struct.unpack('I',msg.data[0:4])
 		(tencB,) = struct.unpack('I',msg.data[4:8])
 
-
-
 		var_enc = enc_msg()
 		var_enc.time = int(tencB)
 		var_enc.data = int(encB)
 		var_enc.encID=1
-		#encb_pub.publish(var_enc)
 
 		enc_pub.publish(var_enc)
 
@@ -125,10 +119,7 @@ if __name__ == '__main__':
 	pubvelD = rospy.Publisher('/velD', Int16, queue_size=100)
 	pubvelI = rospy.Publisher('/velI', Int16, queue_size=100)
 	pubmodoPC = rospy.Publisher('/modoPC', Int16, queue_size=100)
-	#pubtencA = rospy.Publisher('/tencA', Int32, queue_size=100)
-	#pubencA = rospy.Publisher('/encA', Int32, queue_size=100)
-	#pubtencB = rospy.Publisher('/tencB', Int32, queue_size=100)
-	#pubencB = rospy.Publisher('/encB', Int32, queue_size=100)
+	enc_pub = rospy.Publisher("enc", enc_msg, queue_size=50) #1 topic for both encoders
 	pubbat = rospy.Publisher('/bat', Int16, queue_size=100)
 	pubSLIT = rospy.Publisher('/SLIT', Int16, queue_size=100)
 	pubSLDD = rospy.Publisher('/SLDD', Int16, queue_size=100)
@@ -142,11 +133,6 @@ if __name__ == '__main__':
 	pubejex = rospy.Publisher('/ejex', Int16, queue_size=100)
 	pubejey = rospy.Publisher('/ejey', Int16, queue_size=100)
 	pubejez = rospy.Publisher('/ejez', Int16, queue_size=100)
-
-	#enca_pub = rospy.Publisher("enca", enc_msg, queue_size=50)
-	#encb_pub = rospy.Publisher("encb", enc_msg, queue_size=50)
-
-	enc_pub = rospy.Publisher("enc", enc_msg, queue_size=50) #1 topic for both encoders
 
 	try:
 		listener()

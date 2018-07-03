@@ -5,10 +5,11 @@
 void control_loop(ros::Rate rate, MyRobot* robot ,controller_manager::ControllerManager* cm)
 
 {
-  const ros::Duration desired_update_freq = ros::Duration((float)1/(float)loop_rate);
+  const ros::Duration desired_update_freq = ros::Duration((float)1/(float)LOOP_RATE);
   ROS_INFO("%s :%f","upate_frec", desired_update_freq.toSec());
-  const double cycle_time_error_threshold = desired_update_freq.toSec()*(double)loop_rate_threshold;
+  const double cycle_time_error_threshold = desired_update_freq.toSec()*(double)LOOP_RATE_THRESHOLD;
   ROS_INFO("%s :%f","threshold_frec", cycle_time_error_threshold);
+
 
   ros::Time last_time=ros::Time::now();
   ros::Duration elapsed_time;
@@ -30,7 +31,12 @@ void control_loop(ros::Rate rate, MyRobot* robot ,controller_manager::Controller
     robot->read();
     cm->update(ros::Time::now(), elapsed_time);
     robot->write();
+#ifdef ADJUST_RATE
+    ros::Rate fixed_rate(robot->compute_period());
+    fixed_rate.sleep();
+#else
     rate.sleep();
+#endif
   }
 
 
@@ -44,11 +50,11 @@ int main(int argc, char **argv)
   ROS_INFO("%s", "Nodo control_iterface iniciado");
 
   MyRobot robot; //Init the objet
-  controller_manager::ControllerManager cm(&robot); //Error
+  controller_manager::ControllerManager cm(&robot);
+  robot.setup(&robot);
   ros::Subscriber vel_sub = n.subscribe("odom_joint_state", 1000,&MyRobot::vel_Callback ,&robot);
 
-
-  boost::thread(control_loop, ros::Rate(loop_rate),&robot,&cm);
+  boost::thread(control_loop, ros::Rate(LOOP_RATE),&robot,&cm);
 
   ros::spin(); //Permite que se ejecuten Callback
 
