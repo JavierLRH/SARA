@@ -1,4 +1,3 @@
-
 <launch>
 
 <param name="use_sim_time" value="false" /> <!-- Used in simulation to manipulate the time. Disabled. -->

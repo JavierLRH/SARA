@@ -3,6 +3,7 @@
 
   <param name="use_sim_time" value="false" /> <!-- Used in simulation to manipulate the time. Disabled. -->
 
+
   <!-- Set the name of the map yaml file: can be overridden on the command line. -->
   <arg name="map" default="map_obstacle.yaml" />
 

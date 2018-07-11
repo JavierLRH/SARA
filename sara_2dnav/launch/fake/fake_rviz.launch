@@ -2,7 +2,7 @@
 
 
   <node pkg="rviz" type="rviz" name="fake_rviz"
-      args="-d $(find sara_2dnav)/rviz/fake.rviz"/>
+      args="-d $(find sara_2dnav)/rviz/fake_sensors_local_global.rviz"/>
 
 
 </launch>

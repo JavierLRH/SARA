@@ -24,7 +24,7 @@
 #define LOOP_RATE_CORRECTION 1 //Hz
 #define LOOP_RATE_CORRECTION_RATE 20 //Correct the delay each 10 control loop
 
-#define DEBUG
+//#define DEBUG
 #define ADJUST_RATE
 
 /************Estructuras********/

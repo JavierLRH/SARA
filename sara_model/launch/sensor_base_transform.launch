@@ -1,0 +1,16 @@
+<launch>
+<param name="use_sim_time" value="false" /> <!-- Used in simulation to manipulate the time. Disabled. -->
+
+<!--static_transform_publisher x y z yaw pitch roll frame_id child_frame_id period_in_ms -->
+
+<node pkg="tf" type="static_transform_publisher" name="STD_broadcaster" args="-0.21 -0.21 0 3.14159 0 0 base_link STD_frame 100" />
+<node pkg="tf" type="static_transform_publisher" name="SDI_broadcaster" args="0.21 0.21 0 0 0 0 base_link SDI_frame 100" />
+<node pkg="tf" type="static_transform_publisher" name="SLIT_broadcaster" args="-0.17 0.27 0 1.5708 0 0 base_link SLIT_frame 100" />
+<node pkg="tf" type="static_transform_publisher" name="SLDD_broadcaster" args="0.17 -0.21 0 -1.5708 0 0 base_link SLDD_frame 100" />
+
+<node pkg="tf" type="static_transform_publisher" name="SLDTD_broadcaster" args="-0.17 -0.21 0 -1.5708 0 0 base_link SLDT_frame 100" />
+<node pkg="tf" type="static_transform_publisher" name="STI_broadcaster" args="-0.21 0.21 0 3.14159 0 0 base_link STI_frame 100" />
+<node pkg="tf" type="static_transform_publisher" name="SLID_broadcaster" args="0.17 0.21 0 1.5708 0 0 base_link SLID_frame 100" />
+<node pkg="tf" type="static_transform_publisher" name="SDD_broadcaster" args="0.21 -0.21 0 0 0 0 base_link SDD_frame 100" />
+
+</launch>
