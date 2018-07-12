@@ -9,6 +9,7 @@ project(sara_2dnav)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   move_base
+  rospy
   #my_odom_configuration_dep
   #my_sensor_configuration_dep
   #my_tf_configuration_dep

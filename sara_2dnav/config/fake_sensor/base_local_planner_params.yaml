@@ -1,0 +1,55 @@
+
+#recovery_behavior_enabled: false
+#clearing_rotation_allowed: false
+controller_frequency: 10 #Default 20 took many time
+
+TrajectoryPlannerROS:
+
+  max_vel_x: 1.0 #meters/sec
+  min_vel_x: -0.1
+  max_vel_y: 0.0  # zero for a differential drive robot
+  min_vel_y: 0.0  #radians/sec
+  max_vel_theta: 3.0
+  min_vel_theta: -3.0
+  min_in_place_vel_theta: 0.4 #radians/sec, in-place rotations
+  escape_vel: -0.1
+  acc_lim_x: 0.5 #meters/sec^2
+  acc_lim_y: 0.0  # zero for a differential drive robot
+  acc_lim_theta: 2.0                                        #radians/sec^2
+
+  holonomic_robot: false
+
+   #####Trajectory Scoring Parameters#####
+
+  meter_scoring: true #goal_distance and path_distance are expressed in units of meters or cells. Cells false.
+  #pdist_scale: 0.4 #The weighting for how much the controller should stay close to the path it was given
+  #gdist_scale: 0.8 #The weighting for how much the controller should attempt to reach its local goal, also controls speed
+
+   #yaw_goal_tolerance: 0.1 # about 6 degrees, The tolerance in radians for the controller in yaw/rotation when achieving its goal
+   #xy_goal_tolerance: 0.05  # 5 cm, The tolerance in meters for the controller in the x & y distance when achieving a goal
+   #latch_xy_goal_tolerance: false
+
+
+   #heading_lookahead: 0.325 #How far to look ahead in meters when scoring different in-place-rotation trajectories
+   #heading_scoring: false #Whether to score based on the robot's heading to the path or its distance from the path
+   #heading_scoring_timestep: 0.8 #How far to look ahead in time in seconds along the simulated trajectory when using heading scoring
+   #occdist_scale: 0.05 #The weighting for how much the controller should attempt to avoid obstacles
+
+   #dwa: false
+
+   #####Oscillation Prevention Parameters######
+   #oscillation_reset_dist: 0.05 #How far the robot must travel in meters before oscillation flags are reset
+
+   ####Others#######
+   #publish_cost_grid_pc: false
+   #prune_plan: true
+    #simple_attractor: false
+
+  ####Forward Simulation Parameters####
+
+  sim_time: 3.0 #The amount of time to forward-simulate trajectories in seconds
+  sim_granularity: 0.05 #The step size, in meters, to take between points on a given trajectory
+  #angular_sim_granularity: 0.15 #The step size, in radians, to take between angular samples on a given trajectory
+  vx_samples: 10 #The number of samples to use when exploring the x velocity space
+  vy_samples: 0  # zero for a differential drive robot
+  vtheta_samples: 20.0

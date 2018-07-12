@@ -11,13 +11,4 @@ local_costmap:
   transform_tolerance: 1.0
 
   plugins:
-    - {name: ultrasonic,   type: "range_sensor_layer::RangeSensorLayer"}
     - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
-
-
-  ultrasonic:
-    clear_threshold:    0.46
-    mark_threshold:     0.8
-    no_readings_timeout: 2.0
-  # ns:     /mobile_base/sensors/sonars
-    topics: ["/SLIT_range", "/SLDD_range", "/STD_range", "/SDI_range","/SLID_range","/SDD_range","/SLDT_range","/STI_range"]

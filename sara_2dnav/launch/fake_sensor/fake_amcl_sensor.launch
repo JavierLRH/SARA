@@ -11,7 +11,7 @@
   <node name="map_server" pkg="map_server" type="map_server" args="$(find sara_2dnav)/maps/$(arg map)"/>
 
   <!-- The move_base node -->
-  <include file="$(find sara_2dnav)/launch/fake/fake_move_base_amcl.launch" />
+  <include file="$(find sara_2dnav)/launch/fake_sensor/fake_move_base_amcl_sensor.launch" />
 
   <!-- Run fake localization compatible with AMCL output -->
   <node pkg="fake_localization" type="fake_localization" name="fake_localization" clear_params="true" output="screen">
