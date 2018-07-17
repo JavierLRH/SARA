@@ -16,8 +16,9 @@ local_costmap:
 
 
   ultrasonic:
-    clear_threshold:    0.46
-    mark_threshold:     0.8
+    clear_threshold:    0.9
+    mark_threshold:     0.95
     no_readings_timeout: 2.0
+    clear_on_max_reading: true
   # ns:     /mobile_base/sensors/sonars
     topics: ["/SLIT_range", "/SLDD_range", "/STD_range", "/SDI_range","/SLID_range","/SDD_range","/SLDT_range","/STI_range"]

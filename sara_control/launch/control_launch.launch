@@ -2,7 +2,7 @@
 
 <param name="use_sim_time" value="false" /> <!-- Used in simulation to manipulate the time. Disabled. -->
   <!-- Launch SARA interface -->
-  <node name="SARA_interface" pkg="sara_control" type="hwinterface_script.py" output="screen"  launch-prefix="gnome-terminal --command" />    <!-- Open in a new window -->
+  <node name="SARA_interface" pkg="sara_control" type="hwinterface_script.py" output="screen"/>    <!-- Open in a new window -->
 
   <!-- Load hardware interface -->
   <node name="SARA_control_interface" pkg="sara_control" type="control_node"  output="screen"/>

@@ -22,7 +22,7 @@ from math import pi
 class LECTURA_CLASS:
 	def __init__(self):
 
-		self.sensor_min_range=0.50 	#m
+		self.sensor_min_range=0.15 	#m
 		self.sensor_max_range=1.5	#m
 		self.field_of_view= pi/3	#rad 60 degree
 
@@ -119,17 +119,17 @@ class LECTURA_CLASS:
 
 		self.max_array_ultrasonic=3
 
-		self.STD_array=[0]*self.max_array_ultrasonic  #Max 15 elements
-		self.SDI_array=[0]*self.max_array_ultrasonic
-		self.SLIT_array=[0]*self.max_array_ultrasonic
-		self.SLDD_array=[0]*self.max_array_ultrasonic
-		self.i=0
+		#self.STD_array=[0]*self.max_array_ultrasonic  #Max 15 elements
+		#self.SDI_array=[0]*self.max_array_ultrasonic
+		#self.SLIT_array=[0]*self.max_array_ultrasonic
+		#self.SLDD_array=[0]*self.max_array_ultrasonic
+		#self.i=0
 
-		self.SLDT_array=[0]*self.max_array_ultrasonic
-		self.STI_array=[0]*self.max_array_ultrasonic
-		self.SLID_array=[0]*self.max_array_ultrasonic
-		self.SDD_array=[0]*self.max_array_ultrasonic
-		self.j=0
+		#self.SLDT_array=[0]*self.max_array_ultrasonic
+		#self.STI_array=[0]*self.max_array_ultrasonic
+		#self.SLID_array=[0]*self.max_array_ultrasonic
+		#self.SDD_array=[0]*self.max_array_ultrasonic
+		#self.j=0
 
 
 
@@ -219,45 +219,45 @@ class LECTURA_CLASS:
 			(SLDD,) = struct.unpack('H', msg.data[6:8])
 
 			#rospy.loginfo("Tamaño i " + str(self.i))
-			self.STD_array[self.i]=STD
-			self.SDI_array[self.i]=SDI
-			self.SLIT_array[self.i]=SLIT
-			self.SLDD_array[self.i]=SLDD
-			self.i=(self.i+1)%self.max_array_ultrasonic #3Values
+			#self.STD_array[self.i]=STD
+			#self.SDI_array[self.i]=SDI
+			#self.SLIT_array[self.i]=SLIT
+			#self.SLDD_array[self.i]=SLDD
+			#self.i=(self.i+1)%self.max_array_ultrasonic #3Values
 
 
-			STD_median=self.calc_median(self.STD_array)
+			#STD_median=self.calc_median(self.STD_array)
 
-			SDI_median=self.calc_median(self.STD_array)
+			#SDI_median=self.calc_median(self.STD_array)
 
-			SLIT_median=self.calc_median(self.SLIT_array)
+			#SLIT_median=self.calc_median(self.SLIT_array)
 
-			SLDD_median=self.calc_median(self.SLDD_array)
+			#SLDD_median=self.calc_median(self.SLDD_array)
 
 			#STD
-			#self.data_STD.range=STD*0.01 #cm to m
-			self.data_STD.range=STD_median*0.01 #cm to m
+			self.data_STD.range=STD*0.01 #cm to m
+			#self.data_STD.range=STD_median*0.01 #cm to m
 			self.data_STD.header.stamp = rospy.Time.now()
 
 			self.STD_pub.publish(self.data_STD)
 
 			#SDI
-			#self.data_SDI.range=SDI*0.01 #cm to m
-			self.data_SDI.range=SDI_median*0.01 #cm to m
+			self.data_SDI.range=SDI*0.01 #cm to m
+			#self.data_SDI.range=SDI_median*0.01 #cm to m
 			self.data_SDI.header.stamp = rospy.Time.now()
 
 			self.SDI_pub.publish(self.data_SDI)
 
 			#SLIT
-			#self.data_SLIT.range=SLIT*0.01 #cm to m
-			self.data_SLIT.range=SLIT_median*0.01 #cm to m
+			self.data_SLIT.range=SLIT*0.01 #cm to m
+			#self.data_SLIT.range=SLIT_median*0.01 #cm to m
 			self.data_SLIT.header.stamp = rospy.Time.now()
 
 			self.SLIT_pub.publish(self.data_SLIT)
 
 			#SLDD
-			#self.data_SLDD.range=SLDD*0.01 #cm to m
-			self.data_SLDD.range=SLDD_median*0.01 #cm to m
+			self.data_SLDD.range=SLDD*0.01 #cm to m
+			#self.data_SLDD.range=SLDD_median*0.01 #cm to m
 			self.data_SLDD.header.stamp = rospy.Time.now()
 
 			self.SLDD_pub.publish(self.data_SLDD)
@@ -270,45 +270,45 @@ class LECTURA_CLASS:
 			(SDD,) = struct.unpack('H', msg.data[:2])
 			#rospy.loginfo("Mensaje sensores 2")
 			#rospy.loginfo("Tamaño j " + str(self.j))
-			self.SLDT_array[self.j]=SLDT
-			self.STI_array[self.j]=STI
-			self.SLID_array[self.j]=SLID
-			self.SDD_array[self.j]=SDD
-			self.j=(self.j+1)%self.max_array_ultrasonic #3Values
+			#self.SLDT_array[self.j]=SLDT
+			#self.STI_array[self.j]=STI
+			#self.SLID_array[self.j]=SLID
+			#self.SDD_array[self.j]=SDD
+			#self.j=(self.j+1)%self.max_array_ultrasonic #3Values
 
-			SLDT_median=self.calc_median(self.SLDT_array)
+			#SLDT_median=self.calc_median(self.SLDT_array)
 
-			STI_median=self.calc_median(self.STI_array)
+			#STI_median=self.calc_median(self.STI_array)
 
-			SLID_median=self.calc_median(self.SLID_array)
+			#SLID_median=self.calc_median(self.SLID_array)
 
-			SDD_median=self.calc_median(self.SDD_array)
+			#SDD_median=self.calc_median(self.SDD_array)
 
 
 			#SLDT
-			#self.data_SLDT.range=SLDT*0.01 #cm to m
-			self.data_SLDT.range=SLDT_median*0.01 #cm to m
+			self.data_SLDT.range=SLDT*0.01 #cm to m
+			#self.data_SLDT.range=SLDT_median*0.01 #cm to m
 			self.data_SLDT.header.stamp = rospy.Time.now()
 
 			self.SLDT_pub.publish(self.data_SLDT)
 
 			#STI
-			#self.data_STI.range=STI*0.01 #cm to m
-			self.data_STI.range=STI_median*0.01 #cm to m
+			self.data_STI.range=STI*0.01 #cm to m
+			#self.data_STI.range=STI_median*0.01 #cm to m
 			self.data_STI.header.stamp = rospy.Time.now()
 
 			self.STI_pub.publish(self.data_STI)
 
 			#SLID
-			#self.data_SLID.range=SLID*0.01 #cm to m
-			self.data_SLID.range=SLID_median*0.01 #cm to m
+			self.data_SLID.range=SLID*0.01 #cm to m
+			#self.data_SLID.range=SLID_median*0.01 #cm to m
 			self.data_SLID.header.stamp = rospy.Time.now()
 
 			self.SLID_pub.publish(self.data_SLID)
 
 			#SDD
-			#self.data_SDD.range=SDD*0.01 #cm to m
-			self.data_SDD.range=SDD_median*0.01 #cm to m
+			self.data_SDD.range=SDD*0.01 #cm to m
+			#self.data_SDD.range=SDD_median*0.01 #cm to m
 			self.data_SDD.header.stamp = rospy.Time.now()
 
 			self.SDD_pub.publish(self.data_SDD)

@@ -1,0 +1,19 @@
+<launch>
+
+
+  <param name="use_sim_time" value="false" /> <!-- Used in simulation to manipulate the time. Disabled. -->
+
+  <!--Model of the wheelchair. -->
+  <include file="$(find sara_model)/launch/sensor_base_transform.launch" />
+
+  <!--Can interface -->
+  <include file="$(find canusb)/launch/can_launch.launch" />
+
+  <!--Control -->
+  <include file="$(find sara_control)/launch/control_launch.launch" />
+
+  <!--Navigation -->
+  <include file="$(find sara_2dnav)/launch/fake_sensor/fake_amcl_sensor.launch" />
+
+
+</launch>

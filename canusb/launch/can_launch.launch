@@ -2,8 +2,6 @@
 
   <master auto="start"/>
 
-  <include file="$(find sara_model)/launch/sensor_base_transform.launch" />
-
   <node name="canusb" pkg="canusb" type="canusb.py" output="screen">
     <param name="port" value="/dev/ttyUSB0" />
     <param name="baud" value="1m" />  <!-- baud = rospy.get_param('~baud') -->
