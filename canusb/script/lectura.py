@@ -22,8 +22,8 @@ from math import pi
 class LECTURA_CLASS:
 	def __init__(self):
 
-		self.sensor_min_range=0.50 	#m
-		self.sensor_max_range=1.5	#m
+		self.sensor_min_range=0.01 	#m
+		self.sensor_max_range= 3.0		#m
 		self.field_of_view= pi/3	#rad 60 degree
 
 	def init_sensor_variables(self):
@@ -228,7 +228,7 @@ class LECTURA_CLASS:
 
 			STD_median=self.calc_median(self.STD_array)
 
-			SDI_median=self.calc_median(self.STD_array)
+			SDI_median=self.calc_median(self.SDI_array)
 
 			SLIT_median=self.calc_median(self.SLIT_array)
 
