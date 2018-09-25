@@ -41,7 +41,7 @@ void MyRobot::setup(MyRobot* robot)
   memset(&time_debug,0x0,sizeof(LOW_LEVEL_TIMING));
   memset(&timing,0x0,sizeof(TIMING));
 
-  cmd_pub = n.advertise<sensor_msgs::JointState>("cmd_pub", 1000); //Publish data
+  cmd_pub = n.advertise<sensor_msgs::JointState>("cmd_wheel", 1000); //Publish data
 
   //ros::Subscriber vel_sub = n.subscribe("odom_joint_state", 1000,&MyRobot::vel_Callback);
 
@@ -95,7 +95,9 @@ void MyRobot::write(void)  // Write data to hardware here. joint_command Publica
     data.velocity.resize(2);
     data.effort.resize(2);
 
-		data.name[LEFT]="LEFT";
+    data.header.stamp=ros::Time::now();
+
+    data.name[LEFT]="LEFT";
 		data.position[LEFT]=0;
 		data.velocity[LEFT]=control_data.cmd[LEFT];
 		data.effort[LEFT]=0;
@@ -118,7 +120,7 @@ int MyRobot::compute_period(void)
   int return_rate=0;
   period_correction.acumulated_delay[LEFT]+=timing.feedback_delay[LEFT];
   period_correction.acumulated_delay[RIGHT]+=timing.feedback_delay[RIGHT];
-  
+
   if (period_correction.loop_counter>LOOP_RATE_CORRECTION_RATE)
   {
     period_correction.average_delay[LEFT]=period_correction.acumulated_delay[LEFT]/LOOP_RATE_CORRECTION_RATE;

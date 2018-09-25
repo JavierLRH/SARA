@@ -207,7 +207,7 @@ class LECTURA_CLASS:
 
 		elif msg.stdId == 528:
 			#rospy.loginfo("Mensaje bat")
-			(bat,) = struct.unpack('B',msg.data[0:1])
+			(bat,) = struct.unpack('I',msg.data[0:4])
 
 			self.pubbat.publish(int(bat))
 

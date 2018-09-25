@@ -15,7 +15,7 @@ TrajectoryPlannerROS:
   escape_vel: -0.1
   acc_lim_x: 0.4 #meters/sec^2
   acc_lim_y: 0.0  # zero for a differential drive robot
-  acc_lim_theta: 2.0                                        #radians/sec^2
+  acc_lim_theta: 1.0                                        #radians/sec^2
 
   holonomic_robot: false
 
@@ -25,7 +25,7 @@ TrajectoryPlannerROS:
   #pdist_scale: 0.4 #The weighting for how much the controller should stay close to the path it was given
   #gdist_scale: 0.8 #The weighting for how much the controller should attempt to reach its local goal, also controls speed
 
-   #yaw_goal_tolerance: 0.1 # about 6 degrees, The tolerance in radians for the controller in yaw/rotation when achieving its goal
+  yaw_goal_tolerance: 0.5 # about 30 degrees, The tolerance in radians for the controller in yaw/rotation when achieving its goal
   xy_goal_tolerance: 0.20  # 5 cm, The tolerance in meters for the controller in the x & y distance when achieving a goal
    #latch_xy_goal_tolerance: false
 
@@ -33,7 +33,7 @@ TrajectoryPlannerROS:
    #heading_lookahead: 0.325 #How far to look ahead in meters when scoring different in-place-rotation trajectories
    #heading_scoring: false #Whether to score based on the robot's heading to the path or its distance from the path
    #heading_scoring_timestep: 0.8 #How far to look ahead in time in seconds along the simulated trajectory when using heading scoring
-  occdist_scale: 0.06 #The weighting for how much the controller should attempt to avoid obstacles
+  occdist_scale: 0.07 #The weighting for how much the controller should attempt to avoid obstacles
 
    #dwa: false
 

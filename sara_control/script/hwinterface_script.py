@@ -32,7 +32,7 @@ class odom_class:
 		self.left= 0
 		self.right= 1
 
-		self.kdato=9.5
+		self.kdato=7.8125
 		self.twistTimeout = 2
 
 
@@ -73,14 +73,14 @@ class odom_class:
 		rospy.loginfo("Iniciado nodo SARA_interface")
 
 		#Publications
-		self.data_pub = rospy.Publisher("odom_joint_state", JointState, queue_size=50)
+		self.data_pub = rospy.Publisher("wheel_state", JointState, queue_size=100)
 		self.canpub = rospy.Publisher('cantx', CAN, queue_size=100)
 
 		#rospy.loginfo('Publicaciones iniciadas')
 
 		#Subscriber
 		rospy.Subscriber("enc", enc_msg, self.callback_odom) #One topic for both encoders
-		rospy.Subscriber("cmd_pub", JointState, self.callback_vel)#Cambiar al mensaje recibido por el control
+		rospy.Subscriber("cmd_wheel", JointState, self.callback_vel)#Cambiar al mensaje recibido por el control
 		rospy.Subscriber("canrx", CAN, self.callback_CAN)
 		rospy.Subscriber("bat", Int16, self.callback_battery)
 
@@ -103,12 +103,12 @@ class odom_class:
 					dato = CAN()
 					dato.stdId = 288
 					dato.extId = -1
-					dato.data = struct.pack('B', 0) + struct.pack('B', 0) + struct.pack('B', 0) + struct.pack('B', 0) + 'A' + struct.pack('B', 0) + struct.pack('B', 0) + struct.pack('B', 0)
+					dato.data = struct.pack('B', 0) + struct.pack('B', 0) + struct.pack('B', 0) + struct.pack('B', 0) + 'C' + struct.pack('B', 0) + struct.pack('B', 0) + struct.pack('B', 0)
 
 					self.canpub.publish(dato)
 
 					#rospy.loginfo_throttle(5, "Parada por no recibir datos")
-					rospy.loginfo_once("Parada por no recibir datos")
+					#rospy.loginfo_once("Parada por no recibir datos")
 
 			#Weelchair status
 			rospy.loginfo_throttle(60,"Battery voltage "+ str(self.vbat)+ "V")
@@ -203,7 +203,7 @@ class odom_class:
 			data.position=[self.posD]
 			data.velocity=[self.wd]
 			data.effort=[0]
-			data.header.stamp = rospy.Time.from_sec(self.time_enc_right_last*(10**-4)) #rospy.Time.now()
+			data.header.stamp = rospy.Time.now() #rospy.Time.from_sec(self.time_enc_right_last*(10**-4))
 			data.header.frame_id = "base_link"
 
 
@@ -231,7 +231,7 @@ class odom_class:
 			data.position=[self.posI]
 			data.velocity=[self.wi]
 			data.effort=[0]
-			data.header.stamp =rospy.Time.from_sec(self.time_enc_left_last*(10**-4)) #rospy.Time.now()
+			data.header.stamp = rospy.Time.now() #rospy.Time.from_sec(self.time_enc_left_last*(10**-4))
 			data.header.frame_id = "base_link"
 
 

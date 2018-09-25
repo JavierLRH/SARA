@@ -52,7 +52,7 @@ int main(int argc, char **argv)
   MyRobot robot; //Init the objet
   controller_manager::ControllerManager cm(&robot);
   robot.setup(&robot);
-  ros::Subscriber vel_sub = n.subscribe("odom_joint_state", 1000,&MyRobot::vel_Callback ,&robot);
+  ros::Subscriber vel_sub = n.subscribe("wheel_state", 1000,&MyRobot::vel_Callback ,&robot);
 
   boost::thread(control_loop, ros::Rate(LOOP_RATE),&robot,&cm);
 
