@@ -1,0 +1,10 @@
+<launch>
+
+<node pkg="rosbag" type="record" name="rosbag_record_diag"  args=" -o /home//javier//bagfiles/wheel_test_controlv2.bag /cmd_wheel /cmd_vel /diff_drive_controller/odom /wheel_state /bat"/>
+
+
+<node name="SARA_test" pkg="test" type="wheel_test.py" output="screen">
+  <param name="fileWL" value= "$(find test)/test_files/consignasWL.txt"/>
+  <param name="fileWR" value= "$(find test)/test_files/consignasWR.txt"/>
+</node>
+</launch>

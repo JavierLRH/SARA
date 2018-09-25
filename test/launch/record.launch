@@ -1,0 +1,7 @@
+<launch>
+
+<node pkg="rosbag" type="record" name="rosbag_record_diag"
+    args=" -o /home//javier//bagfiles/estatico_corto.bag /cmd_wheel /cmd_vel /diff_drive_controller/odom /wheel_state"/>
+
+<node name="SARA_test" pkg="test" type="recorrido_terrazav1_corto.py" output="screen"/>
+</launch>
