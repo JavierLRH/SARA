@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-#####Creador Francisco Javier La Roda######
-#####Funcion: Interface entre el controlador hw_interface y el bus can
-#####Recibe: Controlador [Joint_State (commandD, commandI)],Can [Datos Encoder]
-####Envia: Controlador[PosD, PosI, Wi, Wd], Can [DatoI, DatoD]
+#Creador: FJR 2018
+#Funcion: Interface entre el controlador hw_interface y el bus can
+#Recibe: Controlador [Joint_State (commandD, commandI)],Can [Datos Encoder]
+#Envia: Controlador[PosD, PosI, Wi, Wd], Can [DatoI, DatoD]
 import math
 import struct
 from math import sin, cos, pi
@@ -24,10 +24,22 @@ from std_msgs.msg import Int16
 
 
 
-class odom_class:
+class HW_CANUSB_CLASS:
+# Function: __init__
+#
+# Comments
+# ----------
+# Constructor of the class HW_CANUSB_CLASS
+# Define system constants.
+#
+# Parameters
+# ----------
+#
+# Returns
+# -------
 	def __init__(self):
 
-		#parametros constantes
+		#constant parameters
 		self.pasos_vuelta=64000.0
 		self.left= 0
 		self.right= 1
@@ -35,14 +47,11 @@ class odom_class:
 		self.kdato=7.8125
 		self.twistTimeout = 2
 
+		self.loop_mode= 'C' #'A' oppen loop, 'C' pid control
+		self.check_period = 5.0
 
-		#Encoders
-		self.time_enc_left=0
-		self.time_enc_right=0
 
-		self.steps_enc_left=0
-		self.steps_enc_right=0
-
+		#Encoders data
 		self.time_enc_left_last=0
 		self.time_enc_right_last=0
 
@@ -50,22 +59,21 @@ class odom_class:
 		self.steps_enc_right_last=0
 
 
-		self.posI=0.0
-		self.posD=0.0
-
-		self.wi=0.0
-		self.wd=0.0
-
-		#command
-		self.comandD=0.0
-		self.comandI=0.0
-
-		self.datod=0
-		self.datoi=0
-
 		#Status variables
 		self.vbat=0.0
 		self.modoPC=0
+
+# Function: main
+#
+# Comments
+# ----------
+# Set up the node, the publications and subsciptions.
+#
+# Parameters
+# ----------
+#
+# Returns
+# -------
 
 	def main(self):
 
@@ -76,29 +84,38 @@ class odom_class:
 		self.data_pub = rospy.Publisher("wheel_state", JointState, queue_size=100)
 		self.canpub = rospy.Publisher('cantx', CAN, queue_size=100)
 
-		#rospy.loginfo('Publicaciones iniciadas')
 
 		#Subscriber
-		rospy.Subscriber("enc", enc_msg, self.callback_odom) #One topic for both encoders
+		rospy.Subscriber("enc", enc_msg, self.callback_enc) #One topic for both encoders
 		rospy.Subscriber("cmd_wheel", JointState, self.callback_vel)#Cambiar al mensaje recibido por el control
 		rospy.Subscriber("canrx", CAN, self.callback_CAN)
 		rospy.Subscriber("bat", Int16, self.callback_battery)
 
 		rospy.loginfo("Esperando sincronizacion")
 
-		#Bucle que para la silla si no se reciben velocidades en un tiempo
-		r = rospy.Rate(2.0)
+		#Check the status of the chair
+		r = rospy.Rate(self.check_period)
 		self.lastTwistTime = rospy.get_time()
 		while not rospy.is_shutdown():
 			self.check(self.modoPC)
 			r.sleep()
 
-
+# Function: check
+#
+# Comments
+# ----------
+# Check the status of the chair
+#
+# Parameters
+# ----------
+#
+# Returns
+# -------
 	def check(self,modo):
 
-			if(modo==3): #Sincronizado con la silla
+			if(modo==3): #Syncronization with the Weelchair.
 
-				if (rospy.get_time() - self.lastTwistTime) > self.twistTimeout: #No he recbido datos en un tiempo, para la silla
+				if (rospy.get_time() - self.lastTwistTime) > self.twistTimeout: #No command reception, stop the Weelchair
 
 					dato = CAN()
 					dato.stdId = 288
@@ -110,64 +127,97 @@ class odom_class:
 					#rospy.loginfo_throttle(5, "Parada por no recibir datos")
 					#rospy.loginfo_once("Parada por no recibir datos")
 
-			#Weelchair status
+			#Battery status
 			rospy.loginfo_throttle(60,"Battery voltage "+ str(self.vbat)+ "V")
 
 
+# Function: callback_vel
+#
+# Comments
+# ----------
+# Callback of the cmd_wheel topic.
+# Convert the velocity in rad/s to data.
+# [0-127] for positive velocity.
+# [255-129] for negative velocity (129 maximun velocity).
+# 0 and 128 stop the wheel.
+#
+# Parameters
+# ----------
+#
+# Returns
+# -------
 
 	def callback_vel(self,msg): #Recepcion de velocidades
 
-		#Guardar variables
-		self.comandD=msg.velocity[self.right] #rad/s
-		self.comandI=msg.velocity[self.left] #rad/s
+		#Save variables
+		comandD=msg.velocity[self.right] #rad/s
+		comandI=msg.velocity[self.left] #rad/s
 
-		#Ganancia
+		#Convert from rad/s to data
 
-		self.datod=int(self.comandD*self.kdato)
-		self.datoi=int(self.comandI*self.kdato)
+		datod=int(comandD*self.kdato)
+		datoi=int(comandI*self.kdato)
 
-		#Saturacion para evitar errores
-		if self.datod>127:
-			self.datod=127
-		if self.datod<-127:
-			self.datod=-127
+		#Saturation of data
+		if datod>127:
+			datod=127
+		if datod<-127:
+			datod=-127
 
-		if self.datoi>127:
-			self.datoi=127
-		if self.datoi<-127:
-			self.datoi=-127
+		if datoi>127:
+			datoi=127
+		if datoi<-127:
+			datoi=-127
 
-		#Ajuste de dato negativo
-		if  self.datod<0:
-			self.datod=256+self.datod #Maxima velocidad 129, 128 parado
+		#Negative velocity convert
+		if datod<0:
+			datod=256 + datod
 
-		if  self.datoi<0:
-			self.datoi=256+self.datoi
+		if datoi<0:
+			datoi=256 + datoi
 
-		if(self.modoPC==3): #Sincronizado con la silla,permito enviar datos
+		if(self.modoPC==3): #Syncronization with the Weelchair.
 			dato = CAN()
 			dato.stdId = 288
 			dato.extId = -1
-			dato.data = struct.pack('B', self.datod) + struct.pack('B', self.datoi) + struct.pack('B', 0) + struct.pack('B', 0) + 'C' + struct.pack('B', 0) + struct.pack('B', 0) + struct.pack('B', 0)
+			dato.data = struct.pack('B', datod) + struct.pack('B', datoi) + struct.pack('B', 0) + struct.pack('B', 0) + self.loop_mode + struct.pack('B', 0) + struct.pack('B', 0) + struct.pack('B', 0)
 
 			self.canpub.publish(dato)
 
 
+		self.lastTwistTime = rospy.get_time() #Update last velocity command time
 
-		#Log datos
-
-		#rospy.loginfo("vx " + str(self.vx) + " vth " + str(self.vth)
-				#	  + " wd " + str(self.wd) + " wi " + str(self.wi)
-				#	  + " datod " +str(self.datod) + " datoi " +str(self.datoi))
-
-		self.lastTwistTime = rospy.get_time() #Actualizar tiempo ultima recepcion de datos
-
+# Function: callback_CAN
+#
+# Comments
+# ----------
+# Callback of the canrx topic.
+# Read the data of syncronization when the mode pc is activated in the
+# numeric keyboard.
+#
+# Parameters
+# ----------
+#
+# Returns
+# -------
 	def callback_CAN(self,msg): #Recepcion de sincronizacion del bus can
 		if msg.stdId == 273:
 			(self.modoPC,)= struct.unpack('B', msg.data[:1])
-			self.sincronizar(self.modoPC)
+			self.synchronize(self.modoPC)
 
-	def sincronizar(self, sinc):
+# Function: synchronize
+#
+# Comments
+# ----------
+# When the mode PC is selected in the numeric keyboad, send a confirmation
+# message to the hardware.
+#
+# Parameters
+# ----------
+#
+# Returns
+# -------
+	def synchronize(self, sinc):
 		if sinc == 3:
 			msg = CAN()
 			msg.stdId = 288
@@ -177,61 +227,74 @@ class odom_class:
 
 
 
-	#Read the encoder data
-	def callback_odom(self,msg):
+# Function: callback_enc
+#
+# Comments
+# ----------
+# Callback of the enc topic
+# Calculate the possition and veocity of the wheels with the encoders data
+# and publish in a JointState message
+#
+# Parameters
+# ----------
+#
+# Returns
+# -------
+
+	def callback_enc(self,msg):
 		if(msg.encID==0): #EncoderA (RIGHT)
 
-			self.time_enc_right=msg.time
-			self.steps_enc_right=msg.data
+			time_enc_right=msg.time
+			steps_enc_right=msg.data
 
-			#Calcular incrementos
-			dt_right=(self.time_enc_right-self.time_enc_right_last)*(10**-4) #100us
-			dsteps_right=self.steps_enc_right-self.steps_enc_right_last
+			#Increment calc
+			dt_right=(time_enc_right-self.time_enc_right_last)*(10**-4) #100us
+			dsteps_right=steps_enc_right-self.steps_enc_right_last
 
 			#Guardiar variables actuales
-			self.time_enc_right_last=self.time_enc_right
-			self.steps_enc_right_last=self.steps_enc_right
+			self.time_enc_right_last=time_enc_right
+			self.steps_enc_right_last=steps_enc_right
 
 			#Posicion
-			self.posD=(self.steps_enc_right/self.pasos_vuelta)*2*pi
+			posD=(steps_enc_right/self.pasos_vuelta)*2*pi
 			#Velocidad angular
-			self.wd=((dsteps_right/self.pasos_vuelta)*2*pi)/dt_right
+			wd=((dsteps_right/self.pasos_vuelta)*2*pi)/dt_right
 
 			#Save data to publish
 			data=JointState()
 			data.name= ["RIGHT"]
-			data.position=[self.posD]
-			data.velocity=[self.wd]
+			data.position=[posD]
+			data.velocity=[wd]
 			data.effort=[0]
-			data.header.stamp = rospy.Time.now() #rospy.Time.from_sec(self.time_enc_right_last*(10**-4))
+			data.header.stamp = rospy.Time.now()
 			data.header.frame_id = "base_link"
 
 
 		elif(msg.encID==1): #EncoderB (LEFT)
 
-			self.time_enc_left=msg.time
-			self.steps_enc_left=msg.data
+			time_enc_left=msg.time
+			steps_enc_left=msg.data
 
 			#Calcular incrementos
-			dt_left=(self.time_enc_left-self.time_enc_left_last)*(10**-4) #100us
-			dsteps_left=self.steps_enc_left-self.steps_enc_left_last
+			dt_left=(time_enc_left-self.time_enc_left_last)*(10**-4) #100us
+			dsteps_left=steps_enc_left-self.steps_enc_left_last
 
 			#Guardiar variables actuales
-			self.time_enc_left_last=self.time_enc_left
-			self.steps_enc_left_last=self.steps_enc_left
+			self.time_enc_left_last=time_enc_left
+			self.steps_enc_left_last=steps_enc_left
 
 			#Distancia
-			self.posI=(self.steps_enc_left/self.pasos_vuelta)*2*pi
+			posI=(steps_enc_left/self.pasos_vuelta)*2*pi
 			#Velocidad angular
-			self.wi=((dsteps_left/self.pasos_vuelta)*2*pi)/dt_left
+			wi=((dsteps_left/self.pasos_vuelta)*2*pi)/dt_left
 
 			#Save data to publish
 			data=JointState()
 			data.name= ["LEFT"]
-			data.position=[self.posI]
-			data.velocity=[self.wi]
+			data.position=[posI]
+			data.velocity=[wi]
 			data.effort=[0]
-			data.header.stamp = rospy.Time.now() #rospy.Time.from_sec(self.time_enc_left_last*(10**-4))
+			data.header.stamp = rospy.Time.now()
 			data.header.frame_id = "base_link"
 
 
@@ -246,5 +309,5 @@ class odom_class:
 
 if __name__ == '__main__':
 
-	odom=odom_class()
+	odom=HW_CANUSB_CLASS()
 	odom.main()
