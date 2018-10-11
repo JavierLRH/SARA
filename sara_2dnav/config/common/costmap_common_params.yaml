@@ -1,0 +1,19 @@
+footprint: [[-0.54 , 0.29], [0.54, 0.29], [0.54, -0.29], [-0.54, -0.29]]
+
+obstacle_layer: #Laser
+  obstacle_range: 2.5
+  raytrace_range: 3.0
+  observation_sources: scan
+  scan: {data_type: LaserScan, topic: /scan, marking: true, clearing: true, expected_update_rate: 0}
+
+
+inflation_layer:
+  inflation_radius: 1.0
+
+ultrasonic:
+  clear_threshold:    0.9
+  mark_threshold:     0.95
+  no_readings_timeout: 2.0
+  clear_on_max_reading: true
+  # ns:     /mobile_base/sensors/sonars
+  topics: ["/SLIT_range", "/SLDD_range", "/STD_range", "/SDI_range","/SLID_range","/SDD_range","/SLDT_range","/STI_range"]
