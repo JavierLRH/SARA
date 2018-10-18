@@ -71,7 +71,7 @@ class LECTURA_CLASS:
 		self.pubvelD = rospy.Publisher('/velD', Int16, queue_size=100)
 		self.pubvelI = rospy.Publisher('/velI', Int16, queue_size=100)
 		self.pubmodoPC = rospy.Publisher('/modoPC', Int16, queue_size=100)
-		self.enc_pub = rospy.Publisher("enc", enc_msg, queue_size=100) #1 topic for both encoders
+		self.enc_pub = rospy.Publisher("/enc", enc_msg, queue_size=100) #1 topic for both encoders
 		self.pubbat = rospy.Publisher('/bat', Int16, queue_size=100)
 
 		self.SLIT_pub = rospy.Publisher("/SLIT_range",Range, queue_size=100)

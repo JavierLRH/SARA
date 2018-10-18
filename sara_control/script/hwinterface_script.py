@@ -86,10 +86,10 @@ class HW_CANUSB_CLASS:
 
 
 		#Subscriber
-		rospy.Subscriber("enc", enc_msg, self.callback_enc) #One topic for both encoders
+		rospy.Subscriber("/enc", enc_msg, self.callback_enc) #One topic for both encoders
 		rospy.Subscriber("cmd_wheel", JointState, self.callback_vel)#Cambiar al mensaje recibido por el control
 		rospy.Subscriber("canrx", CAN, self.callback_CAN)
-		rospy.Subscriber("bat", Int16, self.callback_battery)
+		rospy.Subscriber("/bat", Int16, self.callback_battery)
 
 		rospy.loginfo("Esperando sincronizacion")
 
