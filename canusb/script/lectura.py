@@ -14,7 +14,7 @@ roslib.load_manifest("canusb");
 from std_msgs.msg import Int16
 from std_msgs.msg import Int32
 from std_msgs.msg import Int8
-from odom.msg import enc_msg
+from sara_control.msg import enc_msg
 from _CAN import CAN
 from sensor_msgs.msg import Range
 from sensor_msgs.msg import Imu
