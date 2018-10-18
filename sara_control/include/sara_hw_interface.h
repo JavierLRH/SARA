@@ -1,6 +1,8 @@
 #ifndef SARA_HW_INTERFACE
 #define SARA_HW_INTERFACE
-/********Librerias*************/
+/*********************************
+************ Includes ************
+**********************************/
 #include <ros/ros.h>
 #include <boost/scoped_ptr.hpp>
 #include <boost/asio/io_service.hpp>
@@ -16,7 +18,9 @@
 
 #include "sensor_msgs/JointState.h"
 
-/**************Definiciones***************/
+/*********************************
+************ Defines *************
+**********************************/
 #define LEFT 0
 #define RIGHT 1
 #define LOOP_RATE 10 /* 10*F_feedback*/
@@ -27,7 +31,9 @@
 //#define DEBUG
 #define ADJUST_RATE
 
-/************Estructuras********/
+/*********************************
+*********** Structures ***********
+**********************************/
 struct LOW_LEVEL_TIMING {
   ros::Time low_level_time[2];
   ros::Time last_low_level_time[2];
@@ -56,7 +62,10 @@ struct CONTROL_DATA{
   double temp_pos[2];
   double temp_vel[2];
 };
-/************Definicion de clases********/
+
+/*********************************
+********** Class defines *********
+**********************************/
 
 class MyRobot : public hardware_interface::RobotHW
 {

@@ -1,13 +1,24 @@
-/********Librerias*************/
+/*********************************
+************ Includes ************
+**********************************/
 #include "sara_hw_interface.h"
 
-/***Variables globales*********/
+/*********************************
+******** Global variables ********
+**********************************/
 CONTROL_DATA control_data;
 LOW_LEVEL_TIMING time_debug;
 TIMING timing;
 PERIOD_CORRECTION period_correction;
 
-
+//*********************************
+// Method:      MyRobot
+// Fullname:    MyRobot::MyRobot
+// Access:      Public
+// Returns:     Void
+// Parameters:
+// Description: Constructor
+//*********************************
 
 MyRobot::MyRobot() //Constructor
  {
@@ -32,10 +43,19 @@ MyRobot::MyRobot() //Constructor
 
   }
 
+//*********************************
+// Method:      setup
+// Fullname:    MyRobot::setup
+// Access:      public
+// Returns:     void
+// Parameters:  Class objet
+// Description: Initial config
+//*********************************
+
 void MyRobot::setup(MyRobot* robot)
 {
 
-  //Inicio las variables
+  //Clear variables
   memset(&control_data,0x0,sizeof(CONTROL_DATA));
   memset(&period_correction,0x0,sizeof(PERIOD_CORRECTION));
   memset(&time_debug,0x0,sizeof(LOW_LEVEL_TIMING));
@@ -43,25 +63,36 @@ void MyRobot::setup(MyRobot* robot)
 
   cmd_pub = n.advertise<sensor_msgs::JointState>("cmd_wheel", 1000); //Publish data
 
-  //ros::Subscriber vel_sub = n.subscribe("odom_joint_state", 1000,&MyRobot::vel_Callback);
 
 
 }
 
+//*********************************
+// Method:      read
+// Fullname:    MyRobot::read
+// Access:      public
+// Returns:     void
+// Parameters:  none
+// Description: Register the data of the encoders
+// from the input variable (temp_pos, temp_vel)
+// to a buffer that not change.
+// We need thar to compute de feedback without problems
+//*********************************
 
-void MyRobot::read(void)   // Read data from hardware here. joint_state
+void MyRobot::read(void)
   {
 
     /*Buffer for the RT thread*/
     memcpy(control_data.pos,control_data.temp_pos,2*sizeof(double));
     memcpy(control_data.vel,control_data.temp_vel,2*sizeof(double));
 
-    //Delay of the feedback
+    //Delay of the feedback. used in method compute_period
     timing.feedback_delay[LEFT]=(ros::Time::now()-timing.feedback_time[LEFT]).toSec();
     timing.feedback_delay[RIGHT]=(ros::Time::now()-timing.feedback_time[RIGHT]).toSec();
-
-
 #ifdef DEBUG
+
+
+
     //Period of the feedback
     timing.feedback_period[LEFT]=(timing.feedback_time[LEFT]-timing.last_feedback_time[LEFT]).toSec();
     timing.feedback_period[RIGHT]=(timing.feedback_time[RIGHT]-timing.last_feedback_time[RIGHT]).toSec();;
@@ -87,9 +118,17 @@ void MyRobot::read(void)   // Read data from hardware here. joint_state
 
   }
 
-void MyRobot::write(void)  // Write data to hardware here. joint_command Publication
+//*********************************
+// Method:      write
+// Fullname:    MyRobot::write
+// Access:      public
+// Returns:     void
+// Parameters:  none
+// Description: Write data to hardware here
+//*********************************
+void MyRobot::write(void)
   {
-    sensor_msgs::JointState data; //Declaro data con el formato JointState
+    sensor_msgs::JointState data; //Data has format JointState
     data.name.resize(2);
     data.position.resize(2);
     data.velocity.resize(2);
@@ -108,13 +147,25 @@ void MyRobot::write(void)  // Write data to hardware here. joint_command Publica
 		data.velocity[RIGHT]=control_data.cmd[RIGHT];
 		data.effort[RIGHT]=0;
 
-    //ROS_INFO("%s (D:%lf I:%lf)", "Publico",cmd[RIGHT], cmd[LEFT]);
-
 		cmd_pub.publish(data);
 
 
+#ifdef DEBUG
+    ROS_INFO("%s (D:%lf I:%lf)", "Publico",cmd[RIGHT], cmd[LEFT]);
+#endif
+
 
   }
+
+//*********************************
+// Method:      compute_period
+// Fullname:    MyRobot::compute_period
+// Access:      public
+// Returns:     return_rate: New rate of the loop
+// Parameters:  none
+// Description: Correct the problem of sincronization
+// between the low leven and high level
+//*********************************
 int MyRobot::compute_period(void)
 {
   int return_rate=0;
@@ -144,7 +195,14 @@ int MyRobot::compute_period(void)
   return return_rate;
 }
 
-  //The message is passed in a boost shared_ptr, which means you can store it off if you want, without worrying about it getting deleted underneath you
+//*********************************
+// Method:      vel_Callback
+// Fullname:    MyRobot::vel_Callback
+// Access:      public
+// Returns:     none
+// Parameters:  data of the topic
+// Description: get the wheel data from the topic wheel_state
+//*********************************
 
 void MyRobot::vel_Callback(const sensor_msgs::JointState::ConstPtr& msg)
   {

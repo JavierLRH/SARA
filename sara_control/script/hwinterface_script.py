@@ -108,7 +108,10 @@ class HW_CANUSB_CLASS:
 #
 # Parameters
 # ----------
-#
+# Mode of the Weelchair
+# 	0 Mode not selected
+# 	3 Mode PC, allows to control the Weelchair
+# 	Others modes. No action
 # Returns
 # -------
 	def check(self,modo):
@@ -143,6 +146,7 @@ class HW_CANUSB_CLASS:
 #
 # Parameters
 # ----------
+# msg: Data of the topic
 #
 # Returns
 # -------
@@ -197,6 +201,7 @@ class HW_CANUSB_CLASS:
 #
 # Parameters
 # ----------
+# msg: Data of the topic
 #
 # Returns
 # -------
@@ -214,6 +219,10 @@ class HW_CANUSB_CLASS:
 #
 # Parameters
 # ----------
+# Mode of the Weelchair
+# 	0 Mode not selected
+# 	3 Mode PC, allows to control the Weelchair
+# 	Others modes. No action
 #
 # Returns
 # -------
@@ -237,6 +246,7 @@ class HW_CANUSB_CLASS:
 #
 # Parameters
 # ----------
+# msg: Data of the topic
 #
 # Returns
 # -------
