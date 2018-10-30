@@ -17,3 +17,4 @@ ultrasonic:
   clear_on_max_reading: true
   # ns:     /mobile_base/sensors/sonars
   topics: ["/SLIT_range", "/SLDD_range", "/STD_range", "/SDI_range","/SLID_range","/SDD_range","/SLDT_range","/STI_range"]
+  topics: ["/SLIT_range", "/SLDD_range", "/STD_range", "/SDI_range","/SLID_range","/SJO_range","/SLDT_range","/STI_range"] #"/SDD_range"
