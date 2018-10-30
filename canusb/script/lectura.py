@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#Creador: FJR 2018
-#Funcion:
-#Recibe:
-#Envia:
 import rospy
 import sys
 import yaml
@@ -82,8 +78,8 @@ class LECTURA_CLASS:
 		self.SDD_pub = rospy.Publisher("/SDD_range",Range, queue_size=100)
 		self.SLDT_pub = rospy.Publisher("/SLDT_range",Range, queue_size=100)
 		self.STI_pub = rospy.Publisher("/STI_range",Range, queue_size=100)
+		self.SJO_pub = rospy.Publisher('/SJO_range',Range, queue_size=100)
 
-		self.pubSJO = rospy.Publisher('/SJO', Int16, queue_size=100)
 		self.pubImu = rospy.Publisher('/imu', Imu, queue_size=100)
 		#self.pubejex = rospy.Publisher('/ejex', Int16, queue_size=100)
 		#self.pubejey = rospy.Publisher('/ejey', Int16, queue_size=100)
@@ -112,7 +108,7 @@ class LECTURA_CLASS:
 		self.data_STD.field_of_view= self.field_of_view #rad
 		self.data_STD.min_range=self.sensor_min_range
 		self.data_STD.max_range=self.sensor_max_range
-		self.data_STD.range=4.0
+		self.data_STD.range=2.0
 		self.data_STD.header.stamp = rospy.Time.now()
 		self.data_STD.header.frame_id = "STD_frame"
 
@@ -195,19 +191,36 @@ class LECTURA_CLASS:
 		self.data_SDD.header.stamp = rospy.Time.now()
 		self.data_SDD.header.frame_id = "SDD_frame"
 
-		self.max_array_ultrasonic=3
 
-		self.STD_array=[0]*self.max_array_ultrasonic  #Max 15 elements
+		#Tercer Mensaje
+		#SJO
+		self.data_SJO=Range()
+		self.data_SJO.radiation_type=self.data_SJO.ULTRASOUND #Ultrasound
+		self.data_SJO.field_of_view= self.field_of_view #rad
+		self.data_SJO.min_range=self.sensor_min_range
+		self.data_SJO.max_range=self.sensor_max_range
+		self.data_SJO.range=2.2
+
+		self.data_SJO.header.stamp = rospy.Time.now()
+		self.data_SJO.header.frame_id = "SJO_frame"
+
+		#Arrays to calculate the median of the ultrasonic data
+		self.max_array_ultrasonic=3
+		#First message
+		self.STD_array=[0]*self.max_array_ultrasonic
 		self.SDI_array=[0]*self.max_array_ultrasonic
 		self.SLIT_array=[0]*self.max_array_ultrasonic
 		self.SLDD_array=[0]*self.max_array_ultrasonic
 		self.i=0
-
+		#Second message
 		self.SLDT_array=[0]*self.max_array_ultrasonic
 		self.STI_array=[0]*self.max_array_ultrasonic
 		self.SLID_array=[0]*self.max_array_ultrasonic
 		self.SDD_array=[0]*self.max_array_ultrasonic
 		self.j=0
+		#Third message
+		self.SJO_array=[0]*self.max_array_ultrasonic
+		self.k=0
 
 
 # Function: callback
@@ -252,7 +265,7 @@ class LECTURA_CLASS:
 
 			var_enc = enc_msg()
 			var_enc.time = int(tencA)
-			var_enc.data = (encA)
+			var_enc.data = int(encA)
 			var_enc.encID=0
 
 			self.enc_pub.publish(var_enc)
@@ -264,7 +277,7 @@ class LECTURA_CLASS:
 
 			var_enc = enc_msg()
 			var_enc.time = int(tencB)
-			var_enc.data = (encB)
+			var_enc.data = int(encB)
 			var_enc.encID=1
 
 			self.enc_pub.publish(var_enc)
@@ -371,13 +384,13 @@ class LECTURA_CLASS:
 
 
 		elif msg.stdId == 515:
+
+			(ejex,) = struct.unpack('H', msg.data[6:8])
+			(ejey,) = struct.unpack('H', msg.data[4:6])
+			(ejez,) = struct.unpack('H', msg.data[2:4])
+			(SJO,) = struct.unpack('H', msg.data[:2])
+
 			#imu
-			(ejez,) = struct.unpack('H', msg.data[6:8])
-			(SJO,) = struct.unpack('H', msg.data[4:6])
-			(ejex,) = struct.unpack('H', msg.data[2:4])
-			(ejey,) = struct.unpack('H', msg.data[:2])
-
-
 			data_imu=Imu()
 			data_imu.header.stamp = rospy.Time.now()
 
@@ -387,12 +400,27 @@ class LECTURA_CLASS:
 			#If you have no estimate for one of the data elements  please set element 0 of the associated covariance matrix to -1
 			data_imu.linear_acceleration_covariance[0] = -1
 
-			self.pubSJO.publish(int(SJO))
 			self.pubImu.publish(data_imu)
 
-			#self.pubejex.publish(int(ejex))
-			#self.pubejey.publish(int(ejey))
-			#self.pubejez.publish(int(ejez))
+			#Joystick ultrasonic sensor
+
+			if self.do_median_calc == True:
+				self.SJO_array[self.k]=SJO
+				self.k=(self.k+1)%self.max_array_ultrasonic #3Values
+
+				SJO_median=self.calc_median(self.SJO_array)
+
+				self.data_SJO.range=SJO_median*0.01 #cm to m
+
+
+			else:
+				self.data_SJO.range=SJO*0.01 #cm to m
+
+
+			self.data_SJO.header.stamp = rospy.Time.now()
+			self.SJO_pub.publish(self.data_SJO)
+
+
 
 
 # Function: calc_median
@@ -443,6 +471,8 @@ class LECTURA_CLASS:
 			self.data_SLID.header.stamp = rospy.Time.now()
 			self.data_SDD.header.stamp = rospy.Time.now()
 
+			self.data_SJO.header.stamp = rospy.Time.now()
+
 			self.STD_pub.publish(self.data_STD)
 			self.SDI_pub.publish(self.data_SDI)
 			self.SLIT_pub.publish(self.data_SLIT)
@@ -452,6 +482,8 @@ class LECTURA_CLASS:
 			self.STI_pub.publish(self.data_STI)
 			self.SLID_pub.publish(self.data_SLID)
 			self.SDD_pub.publish(self.data_SDD)
+
+			self.SJO_pub.publish(self.data_SJO)
 
 			r.sleep()
 
