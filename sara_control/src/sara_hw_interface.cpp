@@ -177,13 +177,29 @@ int MyRobot::compute_period(void)
     period_correction.average_delay[LEFT]=period_correction.acumulated_delay[LEFT]/LOOP_RATE_CORRECTION_RATE;
     period_correction.average_delay[RIGHT]=period_correction.acumulated_delay[RIGHT]/LOOP_RATE_CORRECTION_RATE;
 
+
     if(period_correction.average_delay[LEFT]<0.02 || period_correction.average_delay[RIGHT]<0.02) //Feedback too close to the control loop
+      {
           return_rate= (LOOP_RATE-LOOP_RATE_CORRECTION);
+          #ifdef DEBUG
+          ROS_INFO("Loop synchronized (Too close). Delay left %lf. Delay right %lf", period_correction.average_delay[LEFT],period_correction.average_delay[RIGHT]);
+          #endif
+      }
 
     else if(period_correction.average_delay[LEFT]>0.08 || period_correction.average_delay[RIGHT]>0.08) //Feedback too far to the control loop
+      {
           return_rate= (LOOP_RATE+LOOP_RATE_CORRECTION);
+          #ifdef DEBUG
+          ROS_INFO("Loop synchronized (Too far). Delay left %lf. Delay right %lf", period_correction.average_delay[LEFT],period_correction.average_delay[RIGHT]);
+          #endif
+      }
     else
+    {
           return_rate= LOOP_RATE;
+          #ifdef DEBUG
+          ROS_INFO("Loop OK. Delay left %lf. Delay right %lf", period_correction.average_delay[LEFT],period_correction.average_delay[RIGHT]);
+          #endif
+          }
 
     memset(&period_correction,0x0,sizeof(PERIOD_CORRECTION)); //Clear de correction values
   }

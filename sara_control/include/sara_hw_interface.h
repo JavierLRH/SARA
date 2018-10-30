@@ -25,7 +25,7 @@
 #define RIGHT 1
 #define LOOP_RATE 10 /* 10*F_feedback*/
 #define LOOP_RATE_THRESHOLD 0.1
-#define LOOP_RATE_CORRECTION 1 //Hz
+#define LOOP_RATE_CORRECTION 5 //Hz
 #define LOOP_RATE_CORRECTION_RATE 20 //Correct the delay each 10 control loop
 
 //#define DEBUG
