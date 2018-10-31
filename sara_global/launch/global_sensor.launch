@@ -4,7 +4,7 @@
   <param name="use_sim_time" value="false" /> <!-- Used in simulation to manipulate the time. Disabled. -->
 
   <!--Model of the wheelchair. -->
-  <include file="$(find sara_model)/launch/sensor_base_transform.launch" />
+  <include file="$(find sara_model)/launch/sara_model_launch.launch" />
 
   <!--Can interface -->
   <include file="$(find canusb)/launch/can_launch.launch" />

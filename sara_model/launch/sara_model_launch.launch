@@ -1,0 +1,12 @@
+<launch>
+<param name="use_sim_time" value="false" /> <!-- Used in simulation to manipulate the time. Disabled. -->
+
+<include file="$(find sara_model)/launch/sensor_base_transform.launch" />
+
+<arg name="model" default="$(find sara_model)/urdf/sara_urdf.xacro"/>
+<param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
+<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+
+
+
+</launch>

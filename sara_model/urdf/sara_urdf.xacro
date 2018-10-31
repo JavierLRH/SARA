@@ -1,0 +1,446 @@
+<?xml version="1.0"?>
+<robot name="sara_v1" xmlns:xacro="http://www.ros.org/wiki/xacro" >
+  <xacro:property name="pi" value="3.14159265358979" />
+
+<!-- Tamano bateria entre las dos ruedas -->
+  <xacro:property name="long_bateria" value="0.4318" />
+  <xacro:property name="ancho_bateria" value="0.46" />
+  <xacro:property name="altura_bateria" value="0.26" />
+  <xacro:property name="separacion_bateria" value="0.03" />
+
+<!-- Link base-->
+ <link name="base_link">
+  </link>
+<!-- Main bateria-->
+  <!-- link de la bateria -->
+  <link name="bateria">
+    <visual>
+      <geometry>
+	<box size="${long_bateria} ${ancho_bateria} ${altura_bateria}"/>
+      </geometry>
+      <material name="black">
+	<color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+  </link>
+
+<!--Union bateria y base. El centro de la bat esta 0.04445 mas alto del centro de la bateria -->
+  <joint name="base_to_bateria" type="fixed">
+    <parent link="base_link"/>
+    <child link="bateria"/>
+    <origin xyz="0 0 ${altura_bateria/2.0+separacion_bateria}"/>
+  </joint>
+ <!-- Link elevacion asiento -->
+  <link name="elev_asiento">
+    <visual>
+      <geometry>
+	<box size="0.2 0.2 0.15"/>
+      </geometry>
+      <material name="black">
+	<color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+  </link>
+  <!-- Link elevacion asiento -->
+  <joint name="bateria_to_elev_asiento" type="fixed">
+    <parent link="bateria"/>
+    <child link="elev_asiento"/>
+    <origin xyz="0 0 ${altura_bateria/2.0}"/>
+  </joint>
+<!-- MOTORES Y RUEDAS -->
+  <xacro:property name="radio_rueda" value="0.16" />
+  <xacro:property name="anchura_rueda" value="0.06" />
+  <xacro:property name="radio_eje" value="0.11" />
+  <xacro:property name="anchura_eje" value="0.05" />
+  <xacro:property name="long_motor" value="0.12" />
+  <xacro:property name="radio_motor" value="0.08" />
+  <xacro:property name="anchura_motor" value="0.08" />
+  <!-- Hacemos un macro para crear los motores y ruedas -->
+<xacro:macro name="motoryruedas" params="lado posicion">
+  <!-- Link para motores ambos lados -->
+      <link name="motor_${lado}">
+      <visual>
+	<geometry>
+	  <box size="${long_motor} ${anchura_motor} ${radio_motor}"/>
+	</geometry>
+	<origin xyz="0 0 0" rpy="0 0 0"/>
+	<material name="motor">
+	  <color rgba="0.25 0.25 0.25 1"/>
+	</material>
+      </visual>
+    </link>
+<!-- union motores con la bateria -->
+    <joint name="bateria_to_motor_${lado}" type="fixed">
+      <parent link="bateria"/>
+      <child link="motor_${lado}"/>
+      <origin xyz="0 ${posicion*(ancho_bateria/2.0+anchura_motor/2.0)} 0" rpy="${pi/2} 0 0"/>
+    </joint>
+ <!--Link Ruedas motores -->
+    <link name="rueda_tras_${lado}">
+      <visual>
+	<geometry>
+	  <cylinder length="${anchura_rueda}" radius="${radio_rueda}"/>
+	</geometry>
+	<origin xyz="0 0 0" rpy="0 0 0"/>
+	<material name="rueda_tras">
+	  <color rgba="0.25 0.25 0.25 1"/>
+	</material>
+      </visual>
+    </link>
+ <!--Union Ruedas motores y motor -->
+    <joint name="motor_to_rueda_tras_${lado}" type="fixed">
+      <parent link="motor_${lado}"/>
+      <child link="rueda_tras_${lado}"/>
+      <origin xyz="0 0 ${-posicion*(anchura_motor/2.0+anchura_rueda/2.0)}" rpy="0 0 0"/>
+    </joint>
+ <!--Link ejes ruedas -->
+    <link name="eje_${lado}">
+      <visual>
+	<geometry>
+	  <cylinder length="${anchura_eje}" radius="${radio_eje}"/>
+	</geometry>
+	<origin xyz="0 0 0" rpy="0 0 0"/>
+	<material name="black_eje">
+	  <color rgba="0.05 0.05 0.05 1"/>
+	</material>
+      </visual>
+    </link>
+    <!--Union ejes con ruedas -->
+    <joint name="ruedas_to_eje_${lado}" type="fixed">
+      <parent link="rueda_tras_${lado}"/>
+      <child link="eje_${lado}"/>
+      <origin xyz="0 0 ${-posicion*0.02}" rpy="0 0 0"/>
+    </joint>
+</xacro:macro>
+ <!--Llamamos al macro de los motores y ruedas -->
+<xacro:motoryruedas lado="der" posicion="-1" />
+<xacro:motoryruedas lado="izq" posicion="1" />
+<!--RUEDAS DELANTERAS -->
+  <xacro:property name="radio_rueda_del" value="0.0762" />
+  <xacro:property name="ancho_rueda_del" value="0.0381" />
+  <xacro:property name="radio_eje_rueda_del" value="0.055" />
+  <xacro:property name="ancho_eje_rueda_del" value="0.04" />
+  <xacro:property name="casterheight" value="0.15" />
+  <xacro:property name="long_barra_horiz" value="0.44" />
+  <xacro:property name="radio_barra_horiz" value="0.02" />
+<!--Macro ruedas delanteras -->
+  <xacro:macro name="ruedas_delant" params="lado posicion">
+  <!--Barra horizontal ruedas -->
+    <link name="barra_horiz_${lado}">
+      <visual>
+	<geometry>
+	  <cylinder length="${long_barra_horiz}" radius="${radio_barra_horiz}"/>
+	</geometry>
+	<origin xyz="0 0 0" rpy="0 0 0"/>
+	<material name="granate">
+	  <color rgba="0.5 0 0 1"/>
+	</material>
+      </visual>
+    </link>
+  <!--junta entre barra horiz y motor -->
+    <joint name="motor_${lado}_to_barra_horiz_${lado}" type="fixed">
+      <parent link="motor_${lado}"/>
+      <child link="barra_horiz_${lado}"/>
+      <origin xyz="${radio_motor+(long_barra_horiz-0.02)/2.0} 0 0" rpy="0 ${-pi/2} 0"/>
+    </joint>
+  <!--Barra vertical ruedas -->
+    <link name="barra_vertical_${lado}">
+      <visual>
+	<geometry>
+	  <cylinder length="0.1" radius="0.02"/>
+	</geometry>
+	<origin xyz="0 0 0" rpy="0 0 0"/>
+	<material name="silver">
+	  <color rgba="1 0 0 1"/>
+	</material>
+      </visual>
+    </link>
+  <!--junta entre barra vert y motor -->
+    <joint name="motor_${lado}_to_barra_vert_${lado}" type="fixed">
+      <parent link="barra_horiz_${lado}"/>
+      <child link="barra_vertical_${lado}"/>
+      <origin xyz="0 ${-0.1/2.0-radio_barra_horiz} ${0.02-long_barra_horiz/2.0}" rpy="${pi/2} 0 0"/>
+    </joint>
+<!--Soporte ruedas delanteras -->
+    <link name="soporte_rueda_${lado}">
+      <visual>
+	<geometry>
+	  <box size="0.04445 0.04445 0.12"/>
+	</geometry>
+	<origin xyz="0 0 0" rpy="0 0 0"/>
+	<material name="gris">
+	  <color rgba="0.45 0.45 0.47 1"/>
+	</material>
+      </visual>
+   </link>
+<!--junta entre barra vert y soporte -->
+    <joint name="barra_vert_to_soporte_${lado}" type="fixed">
+      <parent link="barra_vertical_${lado}"/>
+      <child link="soporte_rueda_${lado}"/>
+      <origin xyz="0 0 -0.02" rpy="0 0 0"/>
+    </joint>
+<!--Ruedas delanteras -->
+    <link name="rueda_del_${lado}">
+      <visual>
+	<geometry>
+	  <cylinder length="${ancho_rueda_del}" radius="${radio_rueda_del}"/>
+	</geometry>
+	<material name="rueda_del">
+	  <color rgba="0.25 0.25 0.25 1"/>
+	</material>
+      </visual>
+    </link>
+<!--junta entre soporte y rueda -->
+    <joint name="soporte_to_rueda_del_${lado}" type="fixed">
+      <parent link="soporte_rueda_${lado}"/>
+      <child link="rueda_del_${lado}"/>
+      <origin xyz="0 0 0.035" rpy="0 ${pi/2} 0"/>
+    </joint>
+<!--Ejes ruedas delanteras -->
+    <link name="eje_rueda_del_${lado}">
+      <visual>
+	<geometry>
+	  <cylinder length="${ancho_eje_rueda_del}" radius="${radio_eje_rueda_del}"/>
+	</geometry>
+	<material name="black">
+	  <color rgba="0 0 0 1"/>
+	</material>
+      </visual>
+    </link>
+ <!--Junta ejes con ruedas delanteras -->
+    <joint name="eje_rueda_del_${lado}_to_rueda_del_${lado}" type="fixed">
+      <parent link="rueda_del_${lado}"/>
+      <child link="eje_rueda_del_${lado}"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+ </xacro:macro>
+<!-- ASIENTO -->
+  <xacro:property name="long_asiento" value="0.43" />
+  <xacro:property name="ancho_asiento" value="0.43" />
+  <xacro:property name="altura_asiento" value="0.02" />
+  <xacro:ruedas_delant lado="der" posicion="-1" />
+  <xacro:ruedas_delant lado="izq" posicion="1" />
+
+<link name="asiento">
+    <visual>
+      <geometry>
+	<box size="${long_asiento} ${ancho_asiento} ${altura_asiento}"/>
+      </geometry>
+      <material name="lightblack">
+	<color rgba="0.025 0.025 0.04 1"/>
+      </material>
+    </visual>
+  </link>
+<!-- Junta asiento y bateria -->
+  <joint name="bateria_to_asiento" type="fixed">
+    <parent link="bateria"/>
+    <child link="asiento"/>
+    <origin xyz="0.13 0 0.2"/>
+  </joint>
+<!-- RESPALDO -->
+  <xacro:property name="long_resp" value="0.03" />
+  <xacro:property name="ancho_resp" value="0.41" />
+  <xacro:property name="altura_resp" value="0.435" />
+  <link name="respaldo">
+    <visual>
+      <geometry>
+	<box size="${long_resp} ${ancho_resp} ${altura_resp}"/>
+      </geometry>
+      <material name="black">
+	<color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+  </link>
+<!-- Junta respaldo y bateria -->
+  <joint name="bateria_to_respaldo" type="fixed">
+    <parent link="bateria"/>
+    <child link="respaldo"/>
+    <origin xyz="${-long_bateria/2+0.06} 0 0.3"/>
+  </joint>
+
+<!-- Apoya brazos -->
+  <xacro:property name="long_barra_brazos" value="0.18" />
+  <xacro:property name="radio_barra_brazos" value="0.01" />
+  <xacro:property name="ancho_soporte_brazos" value="0.0635" />
+  <xacro:property name="espesor_soporte_brazos" value="0.04" />
+
+  <xacro:macro name="apoya_brazos" params="lado long_soporte_brazos separacion_barras">
+<!-- Barras verticales -->
+    <link name="barra_brazos_${lado}">
+      <visual>
+	<geometry>
+	  <cylinder length="${long_barra_brazos}" radius="${radio_barra_brazos}"/>
+	</geometry>
+	<origin xyz="0 0 0" rpy="0 0 0"/>
+	<material name="black">
+	  <color rgba="0 0 0 1"/>
+	</material>
+      </visual>
+    </link>
+
+    <link name="barra_brazos_tras_${lado}">
+      <visual>
+	<geometry>
+	  <cylinder length="${long_barra_brazos}" radius="${radio_barra_brazos}"/>
+	</geometry>
+	<origin xyz="0 0 0" rpy="0 0 0"/>
+	<material name="black">
+	  <color rgba="0 0 0 1"/>
+	</material>
+      </visual>
+    </link>
+<!-- Uniones barras delantera con trasera apoyabrazos -->
+    <joint name="barra_brazos_to_barra_brazos_tras_${lado}" type="fixed">
+      <parent link="barra_brazos_${lado}"/>
+      <child link="barra_brazos_tras_${lado}"/>
+      <origin xyz="${-separacion_barras} 0 0" rpy="0 0 0"/>
+    </joint>
+<!-- Soporte apoyabrazos -->
+    <link name="soporte_brazos_${lado}">
+      <visual>
+	<geometry>
+	  <box size="${long_soporte_brazos} ${ancho_soporte_brazos} ${espesor_soporte_brazos}"/>
+	</geometry>
+      <material name="lightblack">
+	<color rgba="0.025 0.025 0.04 1"/>
+      </material>
+      </visual>
+    </link>
+<!-- Union barra_brazos y soporte apoyabrazos. -->
+  <joint name="barra_brazos_to_soporte_brazos_${lado}" type="fixed">
+    <parent link="barra_brazos_${lado}"/>
+    <child link="soporte_brazos_${lado}"/>
+    <origin xyz="${-0.25*long_soporte_brazos} 0 ${long_barra_brazos/2.0}"/>
+  </joint>
+  </xacro:macro>
+  <xacro:property name="long_soporte_der" value="0.3048" />
+  <xacro:apoya_brazos lado="izq" long_soporte_brazos="0.4318" separacion_barras="0.3048" />
+  <xacro:apoya_brazos lado="der" long_soporte_brazos="${long_soporte_der}" separacion_barras="0.20" />
+<!-- Union barras delanteras y asiento -->
+  <joint name="asiento_to_barra_brazos_izq" type="fixed">
+    <parent link="asiento"/>
+    <child link="barra_brazos_izq"/>
+    <origin xyz="0.13 ${ancho_asiento/2.0} ${long_barra_brazos/2.0}"/>
+  </joint>
+  <joint name="asiento_to_barra_brazos_der" type="fixed">
+    <parent link="asiento"/>
+    <child link="barra_brazos_der"/>
+    <origin xyz="0 ${-ancho_asiento/2.0} ${long_barra_brazos/2.0}"/>
+  </joint>
+<!-- Control Joystick -->
+  <link name="joystick">
+    <visual>
+      <geometry>
+	<box size="0.1778 0.0635 0.0508"/>
+      </geometry>
+      <material name="joystick">
+	<color rgba="0.25 0.25 0.25 1"/>
+      </material>
+    </visual>
+  </link>
+<!-- Union Joystick y soporte derecho -->
+  <joint name="soporte_der_to_joystick" type="fixed">
+    <parent link="soporte_brazos_der"/>
+    <child link="joystick"/>
+    <origin xyz="${long_soporte_der/2.0+0.1778/2.0} 0 0"/>
+  </joint>
+<!-- Bola joystick -->
+  <link name="bola_joystick">
+    <visual>
+      <geometry>
+	<sphere radius="0.01651"/>
+      </geometry>
+      <material name="lightblack">
+	<color rgba="0.025 0.025 0.04 1"/>
+      </material>
+    </visual>
+  </link>
+<!-- Union joystick y bola joystick -->
+  <joint name="joystick_to_bola" type="fixed">
+    <parent link="joystick"/>
+    <child link="bola_joystick"/>
+    <origin xyz="0.04 0 0.03175"/>
+  </joint>
+<!-- palo joystick -->
+  <link name="joystick_palo">
+    <visual>
+      <geometry>
+	<cylinder length="0.05" radius="0.007"/>
+      </geometry>
+      <material name="lightblack">
+	<color rgba="0.025 0.025 0.04 1"/>
+      </material>
+    </visual>
+  </link>
+<!-- Union palo y bola joystick -->
+  <joint name="joystick_bola_to_palo" type="fixed">
+    <parent link="bola_joystick"/>
+    <child link="joystick_palo"/>
+    <origin xyz="0 0 0.009525"/>
+  </joint>
+<!-- Reposa piernas -->
+  <xacro:property name="long_reposapiernas" value="0.2032" />
+  <xacro:property name="altura_reposapiernas" value="0.254" />
+  <xacro:property name="prof_soporte_pies" value="0.14" />
+  <xacro:property name="ancho_soporte_pies" value="0.20" />
+  <xacro:property name="radio_tubo_reposapiernas" value="0.01" />
+
+  <xacro:macro name="reposa_piernas" params="lado posicion">
+    <!-- Reposa piernas horiz -->
+    <link name="reposapiernas_horiz_${lado}">
+      <visual>
+	<geometry>
+	  <cylinder length="${altura_reposapiernas}" radius="${radio_tubo_reposapiernas}"/>
+	</geometry>
+	<origin xyz="0 0 0" rpy="0 0 0"/>
+	<material name="granate">
+	  <color rgba="0.5 0 0 1"/>
+	</material>
+      </visual>
+    </link>
+    <!-- Union reposa piernas horiz y bateria -->
+    <joint name="bateria_to_reposapiernas_horiz_${lado}" type="fixed">
+      <parent link="bateria"/>
+      <child link="reposapiernas_horiz_${lado}"/>
+      <origin xyz="0.42 ${posicion*0.21} 0.15" rpy="0 ${pi/2} 0"/>
+    </joint>
+    <!-- Reposa piernas horiz -->
+    <link name="reposapiernas_vert_${lado}">
+      <visual>
+	<geometry>
+	  <cylinder length="${altura_reposapiernas}" radius="${radio_tubo_reposapiernas}"/>
+	</geometry>
+	<origin xyz="0 0 ${altura_reposapiernas/2.0}" rpy="0 0 0"/>
+	<material name="granate">
+	  <color rgba="0.5 0 0 1"/>
+	</material>
+      </visual>
+    </link>
+    <!-- Union reposa piernas horiz y vert -->
+    <joint name="reposapiernas_vert__to_horiz_${lado}" type="fixed">
+      <parent link="reposapiernas_horiz_${lado}"/>
+      <child link="reposapiernas_vert_${lado}"/>
+      <origin xyz="0 0 ${long_reposapiernas/2.0-radio_tubo_reposapiernas/2.0}" rpy="0 ${pi/2-0.4} 0"/>
+    </joint>
+    <!-- soporte pies reposa piernas-->
+    <link name="soporte_pies_${lado}">
+      <visual>
+	<geometry>
+	  <box size="${prof_soporte_pies} ${ancho_soporte_pies} 0.0254"/>
+	</geometry>
+	<origin xyz="0 0 0" rpy="0 0 0"/>
+	<material name="black">
+	  <color rgba="0 0 0 1"/>
+	</material>
+      </visual>
+    </link>
+     <!-- Union soporte pies y reposapiernas vertical-->
+    <joint name="reposapiernas_vert_to_soporte_pies_${lado}" type="fixed">
+      <parent link="reposapiernas_vert_${lado}"/>
+      <child link="soporte_pies_${lado}"/>
+      <origin xyz="0 ${-posicion*ancho_soporte_pies/2.0} ${long_reposapiernas+0.04}" rpy="0 0.4 0"/>
+    </joint>
+  </xacro:macro>
+  <xacro:reposa_piernas lado="der" posicion="-1" />
+  <xacro:reposa_piernas lado="izq" posicion="1" />
+</robot>

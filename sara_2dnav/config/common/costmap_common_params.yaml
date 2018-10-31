@@ -1,4 +1,4 @@
-footprint: [[-0.54 , 0.29], [0.54, 0.29], [0.54, -0.29], [-0.54, -0.29]]
+footprint: [[-0.30 , 0.38], [0.70, 0.38], [0.70, -0.38], [-0.30, -0.38]]
 
 obstacle_layer: #Laser
   obstacle_range: 2.5
@@ -16,5 +16,4 @@ ultrasonic:
   no_readings_timeout: 2.0
   clear_on_max_reading: true
   # ns:     /mobile_base/sensors/sonars
-  topics: ["/SLIT_range", "/SLDD_range", "/STD_range", "/SDI_range","/SLID_range","/SDD_range","/SLDT_range","/STI_range"]
   topics: ["/SLIT_range", "/SLDD_range", "/STD_range", "/SDI_range","/SLID_range","/SJO_range","/SLDT_range","/STI_range"] #"/SDD_range"
