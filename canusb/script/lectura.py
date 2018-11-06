@@ -108,7 +108,7 @@ class LECTURA_CLASS:
 		self.data_STD.field_of_view= self.field_of_view #rad
 		self.data_STD.min_range=self.sensor_min_range
 		self.data_STD.max_range=self.sensor_max_range
-		self.data_STD.range=2.0
+		self.data_STD.range=self.sensor_max_range
 		self.data_STD.header.stamp = rospy.Time.now()
 		self.data_STD.header.frame_id = "STD_frame"
 
@@ -118,7 +118,7 @@ class LECTURA_CLASS:
 		self.data_SDI.field_of_view= self.field_of_view #rad
 		self.data_SDI.min_range=self.sensor_min_range
 		self.data_SDI.max_range=self.sensor_max_range
-		self.data_SDI.range=1.4
+		self.data_SDI.range= float('Inf')
 		self.data_SDI.header.stamp = rospy.Time.now()
 		self.data_SDI.header.frame_id = "SDI_frame"
 
@@ -128,7 +128,7 @@ class LECTURA_CLASS:
 		self.data_SLIT.field_of_view= self.field_of_view #rad
 		self.data_SLIT.min_range=self.sensor_min_range
 		self.data_SLIT.max_range=self.sensor_max_range
-		self.data_SLIT.range=3.0
+		self.data_SLIT.range=self.sensor_max_range
 		self.data_SLIT.header.stamp = rospy.Time.now()
 		self.data_SLIT.header.frame_id = "SLIT_frame"
 
@@ -139,7 +139,7 @@ class LECTURA_CLASS:
 		self.data_SLDD.field_of_view= self.field_of_view #rad
 		self.data_SLDD.min_range=self.sensor_min_range
 		self.data_SLDD.max_range=self.sensor_max_range
-		self.data_SLDD.range=3.0
+		self.data_SLDD.range=self.sensor_max_range
 		self.data_SLDD.header.stamp = rospy.Time.now()
 		self.data_SLDD.header.frame_id = "SLDD_frame"
 
@@ -150,7 +150,7 @@ class LECTURA_CLASS:
 		self.data_SLDT.field_of_view= self.field_of_view #rad
 		self.data_SLDT.min_range=self.sensor_min_range
 		self.data_SLDT.max_range=self.sensor_max_range
-		self.data_SLDT.range=3.0
+		self.data_SLDT.range=self.sensor_max_range
 
 		self.data_SLDT.header.stamp = rospy.Time.now()
 		self.data_SLDT.header.frame_id = "SLDT_frame"
@@ -162,7 +162,7 @@ class LECTURA_CLASS:
 		self.data_STI.field_of_view= self.field_of_view #rad
 		self.data_STI.min_range=self.sensor_min_range
 		self.data_STI.max_range=self.sensor_max_range
-		self.data_STI.range=3.0
+		self.data_STI.range=self.sensor_max_range
 
 		self.data_STI.header.stamp = rospy.Time.now()
 		self.data_STI.header.frame_id = "STI_frame"
@@ -174,7 +174,7 @@ class LECTURA_CLASS:
 		self.data_SLID.field_of_view= self.field_of_view #rad
 		self.data_SLID.min_range=self.sensor_min_range
 		self.data_SLID.max_range=self.sensor_max_range
-		self.data_SLID.range=3.0
+		self.data_SLID.range=self.sensor_max_range
 
 		self.data_SLID.header.stamp = rospy.Time.now()
 		self.data_SLID.header.frame_id = "SLID_frame"
@@ -186,7 +186,7 @@ class LECTURA_CLASS:
 		self.data_SDD.field_of_view= self.field_of_view #rad
 		self.data_SDD.min_range=self.sensor_min_range
 		self.data_SDD.max_range=self.sensor_max_range
-		self.data_SDD.range=2.2
+		self.data_SDD.range=self.sensor_max_range
 
 		self.data_SDD.header.stamp = rospy.Time.now()
 		self.data_SDD.header.frame_id = "SDD_frame"
@@ -199,7 +199,7 @@ class LECTURA_CLASS:
 		self.data_SJO.field_of_view= self.field_of_view #rad
 		self.data_SJO.min_range=self.sensor_min_range
 		self.data_SJO.max_range=self.sensor_max_range
-		self.data_SJO.range=2.2
+		self.data_SJO.range=1.0
 
 		self.data_SJO.header.stamp = rospy.Time.now()
 		self.data_SJO.header.frame_id = "SJO_frame"
@@ -320,6 +320,12 @@ class LECTURA_CLASS:
 				self.data_SLIT.range=SLIT*0.01 #cm to m
 				self.data_SLDD.range=SLDD*0.01 #cm to m
 
+			#Adjust min and max values
+			self.data_STD.range=self.saturate_ultrasonic_data(self.data_STD.range)
+			self.data_SDI.range=self.saturate_ultrasonic_data(self.data_SDI.range)
+			self.data_SLIT.range=self.saturate_ultrasonic_data(self.data_SLIT.range)
+			self.data_SLDD.range=self.saturate_ultrasonic_data(self.data_SLDD.range)
+
 			#STD
 			self.data_STD.header.stamp = rospy.Time.now()
 			self.STD_pub.publish(self.data_STD)
@@ -365,6 +371,12 @@ class LECTURA_CLASS:
 				self.data_STI.range=STI*0.01 #cm to m
 				self.data_SLID.range=SLID*0.01 #cm to m
 				self.data_SDD.range=SDD*0.01 #cm to m
+
+			#Adjust min and max values
+			self.data_SLDT.range=self.saturate_ultrasonic_data(self.data_SLDT.range)
+			self.data_STI.range=self.saturate_ultrasonic_data(self.data_STI.range)
+			self.data_SLID.range=self.saturate_ultrasonic_data(self.data_SLID.range)
+			self.data_SDD.range=self.saturate_ultrasonic_data(self.data_SDD.range)
 
 			#SLDT
 			self.data_SLDT.header.stamp = rospy.Time.now()
@@ -417,6 +429,9 @@ class LECTURA_CLASS:
 				self.data_SJO.range=SJO*0.01 #cm to m
 
 
+			#Adjust min and max values
+			self.data_SJO.range=self.saturate_ultrasonic_data(self.data_SJO.range)
+
 			self.data_SJO.header.stamp = rospy.Time.now()
 			self.SJO_pub.publish(self.data_SJO)
 
@@ -443,6 +458,30 @@ class LECTURA_CLASS:
 		mediana=dOrder[middle+1]
 
 		return mediana
+
+# Function: saturate_ultrasonic_data
+#
+# Comments
+# ----------
+# Limit the max and min reading of the ultrasonics sensor.
+# It allows to clean the obstacles in range_sensor_layer
+#
+# Parameters
+# ----------
+#
+# Returns
+# -------
+# Corrected value
+	def	saturate_ultrasonic_data(self,data):
+
+		if data == 0: #Infinite value
+			return float('Inf')
+		elif data > self.sensor_max_range:
+			return self.sensor_max_range
+		elif data<self.sensor_min_range:
+			return self.sensor_min_range
+		else: #Inside the limits of range
+			return data
 
 
 # Function: debug_publish
