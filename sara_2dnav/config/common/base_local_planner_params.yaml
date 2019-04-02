@@ -5,14 +5,14 @@ controller_frequency: 10 #Default 20 took many time
 
 TrajectoryPlannerROS:
 
-  max_vel_x: 0.6 #meters/sec
+  max_vel_x: 0.4 #meters/sec #0.6
   min_vel_x: -0.1
   max_vel_y: 0.0  # zero for a differential drive robot
   min_vel_y: 0.0  #radians/sec
-  max_vel_theta: 3.0
-  min_vel_theta: -3.0
-  min_in_place_vel_theta: 0.2 #radians/sec, in-place rotations
-  escape_vel: -0.1
+  max_vel_theta: 1.0 #3
+  min_vel_theta: -1.0
+  min_in_place_vel_theta: 0.1 #radians/sec, in-place rotations
+  escape_vel: -0.1 #0.1
   acc_lim_x: 0.4 #meters/sec^2
   acc_lim_y: 0.0  # zero for a differential drive robot
   acc_lim_theta: 1.0                                        #radians/sec^2

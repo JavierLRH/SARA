@@ -11,8 +11,8 @@ inflation_layer:
   inflation_radius: 1.0
 
 ultrasonic:
-  clear_threshold:    0.9
-  mark_threshold:     0.95
+  clear_threshold:    0.3
+  mark_threshold:     0.6
   no_readings_timeout: 2.0
   clear_on_max_reading: true
   # ns:     /mobile_base/sensors/sonars

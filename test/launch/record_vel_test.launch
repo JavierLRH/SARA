@@ -1,10 +1,11 @@
 <launch>
 
-<node pkg="rosbag" type="record" name="rosbag_record_diag"  args=" -o /home//javier//bagfiles/vel_test.bag /cmd_wheel /cmd_vel /diff_drive_controller/odom /wheel_state /bat"/>
+<node pkg="rosbag" type="record" name="rosbag_record_diag"
+  args=" -o /home//sara//bagfiles/recta_larga_carga_correcion.bag /cmd_wheel /cmd_vel /diff_drive_controller/odom /wheel_state /bat"/>
 
 
 <node name="SARA_test" pkg="test" type="vel_test.py" output="screen">
-  <param name="fileV" value= "$(find test)/test_files/consignasV.txt"/>
-  <param name="filew" value= "$(find test)/test_files/consignasw.txt"/>
+  <param name="fileV" value= "$(find test)/test_files/consignasV_recta.txt"/>
+  <param name="filew" value= "$(find test)/test_files/consignasw_recta.txt"/>
 </node>
 </launch>

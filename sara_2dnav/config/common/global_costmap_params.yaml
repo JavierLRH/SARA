@@ -2,13 +2,14 @@ global_costmap:
 
   plugins:
     - {name: static_map,       type: "costmap_2d::StaticLayer"}
+    #- {name: ultrasonic,   type: "range_sensor_layer::RangeSensorLayer"}
     - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
 
   global_frame: "map"
   robot_base_frame: "base_link"
 
   publish_frequency: 50.0
-  update_frequency: 3.0
+  update_frequency: 2.0
 
   resolution: 0.5 #0.01 #The resolution of the map in meters/cell.
   transform_tolerance: 0.2 #Specifies the delay in transform (tf) data that is tolerable in seconds

@@ -39,7 +39,7 @@ class LECTURA_CLASS:
 	def __init__(self):
 
 		self.sensor_min_range=0.01 	#m
-		self.sensor_max_range= 3.0	#m
+		self.sensor_max_range= 2.5	#m
 		self.field_of_view= pi/3	#rad 60 degree
 		self.do_median_calc = True
 
@@ -550,6 +550,6 @@ if __name__ == '__main__':
 	lectura=LECTURA_CLASS()
 	lectura.start_node()
 	try:
-		lectura.lisener()
-		#lectura.debug_publish()
+		#lectura.lisener()
+		lectura.debug_publish()
 	except rospy.ROSInterruptException: pass

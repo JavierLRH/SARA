@@ -40,7 +40,7 @@ class vel_test_class:
 		F.close()
 
 
-		r = rospy.Rate(1.0) #100ms
+		r = rospy.Rate(10.0) #100ms
 
 		while not rospy.is_shutdown():
 			#Enviar comandos

@@ -1,4 +1,4 @@
-image: uah_map.png
+image: pasillo_map.png
 resolution: 0.02520696
 origin: [0, 0, 0]
 occupied_thresh: 0.65
