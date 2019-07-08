@@ -4,15 +4,15 @@
 <!--static_transform_publisher x y z yaw pitch roll frame_id child_frame_id period_in_ms -->
 
 <node pkg="tf" type="static_transform_publisher" name="STD_broadcaster" args="-0.19 -0.21 0.35 3.14159 0 0 base_link STD_frame 100" />
-<node pkg="tf" type="static_transform_publisher" name="SDI_broadcaster" args="0.35 0.22 0.35 0 0 0 base_link SDI_frame 100" />
+<node pkg="tf" type="static_transform_publisher" name="SDI_broadcaster" args="0.56 0.22 0.55 0.7854 0 0 base_link SDI_frame 100" />
 <node pkg="tf" type="static_transform_publisher" name="SLIT_broadcaster" args="-0.17 0.21 0.35 1.5708 0 0 base_link SLIT_frame 100" />
 <node pkg="tf" type="static_transform_publisher" name="SLDD_broadcaster" args="0.36 -0.21 0.35 -1.5708 0 0 base_link SLDD_frame 100" />
 
 <node pkg="tf" type="static_transform_publisher" name="SLDT_broadcaster" args="-0.17 -0.21 0.35 -1.5708 0 0 base_link SLDT_frame 100" />
 <node pkg="tf" type="static_transform_publisher" name="STI_broadcaster" args="-0.19 0.21 0.35 3.14159 0 0 base_link STI_frame 100" />
 <node pkg="tf" type="static_transform_publisher" name="SLID_broadcaster" args="0.36 0.21 0.35 1.5708 0 0 base_link SLID_frame 100" />
-<node pkg="tf" type="static_transform_publisher" name="SDD_broadcaster" args="0.36 -0.22 0.1 0 0 0 base_link SDD_frame 100" />
+<node pkg="tf" type="static_transform_publisher" name="SDD_broadcaster" args="0.56 -0.22 0.55 -0.7854 0 0 base_link SDD_frame 100" />
 
-<node pkg="tf" type="static_transform_publisher" name="SJO_broadcaster" args="0.38 -0.22 0.56 0 0 0 base_link SJO_frame 100" />
+<node pkg="tf" type="static_transform_publisher" name="SJO_broadcaster" args="0.58 0 0.56 0 0 0 base_link SJO_frame 100" />
 
 </launch>

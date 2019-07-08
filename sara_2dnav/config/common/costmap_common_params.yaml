@@ -8,7 +8,7 @@ obstacle_layer: #Laser
 
 
 inflation_layer:
-  inflation_radius: 1.0
+  inflation_radius: 0.75
 
 ultrasonic:
   clear_threshold:    0.3
@@ -16,4 +16,4 @@ ultrasonic:
   no_readings_timeout: 2.0
   clear_on_max_reading: true
   # ns:     /mobile_base/sensors/sonars
-  topics: ["/SLIT_range", "/SLDD_range", "/STD_range", "/SDI_range","/SLID_range","/SJO_range","/SLDT_range","/STI_range"] #"/SDD_range"
+  topics: ["/SLIT_range", "/SLDD_range", "/STD_range", "/SDI_range","/SLID_range","/SJO_range","/SLDT_range","/STI_range","/SDD_range"]
