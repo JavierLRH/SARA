@@ -550,6 +550,6 @@ if __name__ == '__main__':
 	lectura=LECTURA_CLASS()
 	lectura.start_node()
 	try:
-		#lectura.lisener()
-		lectura.debug_publish()
+		lectura.lisener()
+		#lectura.debug_publish()
 	except rospy.ROSInterruptException: pass
