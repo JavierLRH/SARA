@@ -1,9 +1,9 @@
 local_costmap:
   plugins:
-    - {name: static_map,       type: "costmap_2d::StaticLayer"}
-    - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
     #- {name: obstacle_layer, type: "costmap_2d::VoxelLayer"} #Laser sensors
+    - {name: static_map,       type: "costmap_2d::StaticLayer"}
     #- {name: ultrasonic,   type: "range_sensor_layer::RangeSensorLayer"}
+    - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
 
   update_frequency: 5.0
   publish_frequency: 50.0
